@@ -1,0 +1,34 @@
+# Better AX for Computer Use
+
+> An independent, MIT-licensed accessibility engineering skill for AI coding
+> agents working on source-modifiable web, Electron, and native applications.
+
+The canonical project is https://github.com/hqhq1025/better-ax-for-computer-use,
+maintained by Haoqing Wang. It provides source-repair guidance and a partial
+Chromium AX audit script. It is not a computer-control runtime, MCP server,
+external adapter, or accessibility certification.
+
+## Entry Points
+
+- [English overview and installation](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/README.md): Purpose, installation, examples, FAQ, and limitations.
+- [简体中文说明](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/README.zh-CN.md): Chinese installation, workflow, and verification boundaries.
+- [Skill instructions](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/SKILL.md): The scoped agent workflow.
+- [Structured project facts](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/project.json): Identity, entrypoints, requirements, and verification scope.
+
+## Engineering Guides
+
+- [Developer checklist](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/developer-checklist.md): Roles, names, state, focus, identity, and privacy.
+- [Platform patterns](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/platform-patterns.md): DOM/ARIA, AppKit/SwiftUI, UIA, Qt, GTK, and custom rendering.
+- [Consumer contract](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/consumer-contract.md): Observation scope, action delivery, effects, stale targets, and timeout recovery.
+- [Verification](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/verification.md): Measured coverage and completion gates.
+- [Source notes](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/evidence-and-ecosystem.md): Public documentation and dated ecosystem inputs.
+
+## Executable Material
+
+- [Audit script](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/scripts/audit_chromium_ax.mjs): Offline JSON or authorized live Chromium capture; Node.js 22+.
+- [Regression tests](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/scripts/audit_chromium_ax.test.mjs): Offline and injected-browser tests, not real-browser E2E.
+- [Synthetic before fixture](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/examples/ax-before.json): Unnamed controls.
+- [Synthetic after fixture](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/examples/ax-after.json): Names and explicit checkbox state.
+
+This file is a documentation index, not a crawler policy or evidence of search
+indexing. A zero audit exit code is not full Computer Use readiness.

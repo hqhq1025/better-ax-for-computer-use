@@ -1,0 +1,8 @@
+{
+  "nodes": [
+    {"nodeId": "root", "ignored": false, "role": {"value": "RootWebArea"}, "frameId": "example", "childIds": ["main"]},
+    {"nodeId": "main", "ignored": false, "role": {"value": "main"}, "childIds": ["save", "enabled"]},
+    {"nodeId": "save", "ignored": false, "role": {"value": "button"}, "name": {"value": ""}},
+    {"nodeId": "enabled", "ignored": false, "role": {"value": "checkbox"}, "name": {"value": ""}}
+  ]
+}

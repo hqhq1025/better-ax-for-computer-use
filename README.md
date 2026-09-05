@@ -1,7 +1,14 @@
 # Better AX for Computer Use
 
-An agent skill for making source-modifiable applications understandable and
-operable through accessibility semantics.
+[English](README.md) | [简体中文](README.zh-CN.md)
+
+[![Tests](https://github.com/hqhq1025/better-ax-for-computer-use/actions/workflows/test.yml/badge.svg)](https://github.com/hqhq1025/better-ax-for-computer-use/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+Better AX for Computer Use is an open-source accessibility engineering skill
+for AI coding agents. It helps developers audit and improve accessibility
+trees, DOM/ARIA semantics, target identity, and action verification in web,
+Electron, and native applications whose source they can modify.
 
 Improve the app's real UI: meaningful controls, reliable state and focus,
 unambiguous targets, and actions whose effects can be verified. AX here covers
@@ -10,6 +17,22 @@ Windows UIA, and Linux accessibility bridges.
 
 This is a developer workflow with a small Chromium AX audit tool. It is not a
 computer-control runtime, external adapter, or accessibility certification.
+
+[Install](#install) · [Try the audit](#try-an-offline-ax-audit) ·
+[Platform coverage](#platform-coverage) · [FAQ](#faq) · [Guides](#guides)
+
+## When to Use It
+
+- A Computer Use agent sees a button but cannot identify or operate it reliably.
+- A React or Electron UI exposes missing labels, ambiguous controls, or stale
+  targets after navigation or virtual-list recycling.
+- A SwiftUI, Qt, Canvas, or other custom control needs native accessibility
+  semantics tied to the same state and commit path as its visual UI.
+- An action reports success but the intended setting or record is not saved.
+
+For example, an unnamed Save button needs a meaningful name and usable state.
+After activation, the workflow must also confirm that the intended record was
+persisted. Passing a tree lint only addresses part of that contract.
 
 ## Install
 
@@ -73,6 +96,21 @@ node scripts/audit_chromium_ax.mjs --tree-file ax-tree.json
 node --test scripts/audit_chromium_ax.test.mjs
 ```
 
+### Try an Offline AX Audit
+
+The repository includes synthetic before/after fixtures:
+
+```sh
+# Reports unnamed controls and exits 1.
+node scripts/audit_chromium_ax.mjs --tree-file examples/ax-before.json
+
+# No blocking findings in the limited tree lint; exits 0.
+node scripts/audit_chromium_ax.mjs --tree-file examples/ax-after.json
+```
+
+The after fixture adds accessible names and an explicit checkbox state.
+It demonstrates the audit format, not a completed browser or business workflow.
+
 The input is a CDP AX node array or an object containing `nodes`. For example:
 
 ```json
@@ -129,6 +167,62 @@ specified path and overwrites an existing file.
 - [Consumer contract and negative cases](references/consumer-contract.md)
 - [Verification and completion gates](references/verification.md)
 - [Public sources and ecosystem inputs](references/evidence-and-ecosystem.md)
+- [Machine-readable project facts](project.json)
+- [Plain-text documentation index](llms.txt)
+
+## Platform Coverage
+
+| Surface | Included guidance | Executable verification included |
+|---|---|---|
+| Web / React / Chromium | HTML, ARIA, controls, focus, frames, controlled input | Partial Chromium AX lint and offline regression tests |
+| Electron | Renderer semantics and native window/process boundaries | Chromium lint only; native bridge requires separate verification |
+| macOS AppKit / SwiftUI | Native controls, virtual elements, representation and persistence | Guidance; no bundled native test runner |
+| Windows UIA | Control types, patterns, state and identity | Guidance; no bundled UIA runner |
+| Qt / GTK / custom rendering | Platform bridges and shared-state semantic representations | Guidance; no bundled platform runner |
+
+Documentation coverage is not a claim that every platform or client has passed
+end-to-end tests.
+
+## FAQ
+
+### How is this different from an accessibility checker?
+
+A checker can detect some semantic defects. This skill guides source changes
+and requires evidence about target resolution, input delivery, and the intended
+business effect as well. It complements human accessibility testing; it does
+not replace WCAG evaluation or assistive-technology testing.
+
+### Does it control my computer or install an MCP server?
+
+No. The skill guides an existing coding agent. The optional script reads saved
+AX trees or captures Chromium AX through an authorized Playwright/CDP connection.
+No computer-control runtime, background recorder, or MCP server is installed.
+
+### Does it work with Codex and other coding agents?
+
+The repository provides a `SKILL.md` entry point and Codex installation example.
+Other agents can read the same instructions and references. Automatic discovery,
+tool permissions, and invocation syntax depend on the client; cross-client
+compatibility has not been end-to-end certified.
+
+### Can it repair a closed-source app?
+
+Source-level fixes require source access. External semantic adapters and
+alternate automation APIs are different approaches outside this skill's scope.
+
+### Does exit code zero mean my app is ready for Computer Use?
+
+No. It means the script found no blocking issues in its limited snapshot checks.
+Warnings, missing surfaces, keyboard/focus behavior, and action effects still
+need review. See the [verification gates](references/verification.md).
+
+### Where does this fit in the Computer Use ecosystem?
+
+This project improves the application that an agent operates. Runtimes execute
+actions; adapters compensate for inaccessible targets; recording tools capture
+demonstrations. See [Awesome Computer Use Ecosystem](https://github.com/hqhq1025/awesome-computer-use-ecosystem)
+for the broader taxonomy and the [source notes](references/evidence-and-ecosystem.md)
+for the mechanisms that informed this skill.
 
 ## Validation and Contributions
 
@@ -138,10 +232,17 @@ tests use injected fakes; they do not replace real-browser or native-app E2E
 validation. Text-based skill scenario checks likewise do not establish live
 application compatibility.
 
-For changes, run the test command above. Add a regression for changed executable
+For changes, run all repository checks:
+
+```sh
+node --test scripts/*.test.mjs
+```
+
+Add a regression for changed executable
 behavior, keep guidance scoped to source-level semantics, and distinguish
 verified runtime behavior from proposed acceptance criteria. Do not submit
 private AX dumps, credentials, user screenshots, or proprietary binaries.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for issue and pull-request guidance.
 
 ## License
 
@@ -151,3 +252,5 @@ Original guidance and tooling are licensed here; referenced projects and
 standards retain their own licenses. No third-party runtime implementation is
 bundled. This is an independent project and is not affiliated with OpenAI,
 Apple, Microsoft, or the referenced ecosystem projects.
+
+Created and maintained by [Haoqing Wang](https://github.com/hqhq1025).

@@ -1,234 +1,151 @@
 ---
 name: better-ax-for-computer-use
-description: Improve source-modifiable web and native apps for Computer Use through DOM/AX semantics, identity, actions, and observable changes. Use for web accessibility and ARIA repairs, AX/UIA audits, agent-operable UI, or Computer History readiness. Not for operating apps, querying personal history, or installing recorders.
+description: Design, audit, and repair source-modifiable web and native applications so Computer Use can understand the UI, act on the right object, and verify outcomes. Use for DOM/ARIA, AX/UIA, custom controls, consumer interoperability, or app-side activity-history readiness. Not for operating apps or installing recorders.
 ---
 
 # Better AX for Computer Use
 
-Make the application itself understandable and operable by Computer Use.
-Implement this primarily through the application's native accessibility and
-semantic UI layer; do not bolt on a second hidden control surface for the agent.
-Native virtual accessibility elements or framework representations are valid
-when they share rendering's authoritative state, actions, and permissions.
+Engineer the application around real user tasks. Make its visible UI and
+accessibility representation express the same objects, state, permissions and
+actions. Then verify what the intended consumer receives and what an operation
+actually changes.
 
-AX here includes browser accessibility trees and platform accessibility
-interfaces, not only macOS AX. Preserve usability for human assistive technology.
+The unit of work is a workflow or component contract, not a count of ARIA
+attributes or named nodes. Human accessibility remains a requirement even when
+the selected agent uses screenshots.
 
-## Boundary
+## Establish the Assignment
 
-Use this skill when the application's source can be changed.
+Determine the requested outcome and change authority from the user and repo:
 
-When the target cannot be repaired in-process, report that an external adapter
-is a separate task outside this skill. Custom rendering alone does not require
-an external adapter when the application source is available.
+| Request | Work to perform | Completion means |
+|---|---|---|
+| Audit or review | Trace the relevant flow using source and permitted evidence | Findings, responsible layers, coverage and unknowns reported |
+| Repair or improve | Reproduce a defect, repair its owner, compare before/after | The scoped defect is fixed with evidence; consumer limits remain explicit |
+| Build or redesign | Define the contract, then implement when requested | Design-only work delivers a reviewable contract; implementation requires relevant tests |
+| Improve activity history | Design or repair app identity, observable transitions and privacy; test an existing consumer only when available and authorized | App-side claims supported independently; capture/reconstruction claims need pipeline evidence |
 
-An audit or review remains read-only. Implement fixes when requested; do not
-expand an app semantics task into a CU runtime, MCP server, new recorder,
-or hidden automation API. History-readiness work can improve source semantics
-and assess an existing consumer; recorder changes require their own scope.
-A narrower requested scope needs only the relevant
-workflow steps and checks below.
+Source-unmodifiable targets require a separately scoped adapter task. Custom
+rendering is in scope when its source can be changed. Audits do not authorize
+edits or state-changing probes. Application improvements do not authorize a new
+runtime, MCP server, recorder, wider permissions, or personal-history access.
 
-Treat WCAG as the human accessibility baseline, not the full Computer Use
-acceptance test. Computer Use also needs complete workflow coverage, stable
-target identity, exact window ownership, and observable post-action effects.
+Read only the references needed for the selected work:
 
-## Workflow
+| Need | Reference |
+|---|---|
+| Define or repair a component's behavior | [Component contracts](references/developer-checklist.md) |
+| Diagnose Web names, input, layers, frames or shadow roots | [Web AX/DOM](references/web-ax-dom.md) |
+| Implement native or custom-rendered semantics | [Platform patterns](references/platform-patterns.md) |
+| Identify what a named TryCua/Codex path consumes | [Consumer profiles](references/web-consumers.md) |
+| Diagnose scope, stale targets, delivery or unknown outcomes | [Consumer contract](references/consumer-contract.md) |
+| Choose evidence and state completion accurately | [Verification](references/verification.md) |
+| Improve recording or reconstruction | [History readiness](references/history-readiness.md), then its linked test plan |
+| Review rationale or source versions | [Evidence notes](references/evidence-and-ecosystem.md) |
 
-### 1. Establish the real surface inventory
+## 1. Define the Task and Its Evidence
 
-Read the repository before editing.
+Read the owning components, state transitions and existing tests. Write down
+what the user must be able to do, to which object, under which conditions, and
+what would establish success or failure. A short paragraph suffices for one
+control; use a workflow table for broader work.
 
-Scope the inventory to the requested app, feature, or component. Record the
-app/framework/build, OS, observation client/version, target window/tab, and
-which capabilities and permissions are actually available. Build a measurable
-inventory of:
+For example: edit the name of project Alpha, submit, and confirm that Alpha's
+stored name changed while Beta remained unchanged. A visible field changing
+does not alone satisfy that task.
 
-- routes, pages, panels, tabs, menus, dialogs, sheets, secondary windows;
-- all actionable component call sites, including controls hidden in unopened
-  menus or conditional states;
-- loading, empty, error, disabled, permission, onboarding, narrow-window, and
-  long-content states;
-- custom Canvas, WebGL, QML, owner-drawn, or virtualized surfaces;
-- platform-specific implementations and packaged-app boundaries.
-
-Do not claim "all pages and buttons" from a few happy-path screenshots. State
-the source count, runtime surfaces, and states actually covered.
-
-### 2. Capture the runtime semantic baseline
-
-Inspect the real accessibility tree after an accessibility client is active.
-For Chromium/Electron, use `scripts/audit_chromium_ax.mjs` as a partial tree
-lint, not a full readiness certificate. For native apps,
-use the platform inspector described in `references/platform-patterns.md`.
-
-Record:
-
-- exposed landmarks, windows, dialogs, and focused element;
-- actionable nodes with role, name, state, value, actions, and bounds;
-- unnamed or ambiguous actionable nodes;
-- duplicate or nested `main` landmarks within the same document/application;
-- controls visible on screen but absent from the tree;
-- stale, duplicated, or host/renderer mirror nodes;
-- whether names and state change correctly after interaction.
-
-Distinguish an unavailable or partial observation from an empty UI. A provider
-failure, permission denial, omitted iframe, or inactive AX subsystem does not
-prove absent semantics. Inventory discovery is not guaranteed to enumerate
-every user tab. Capture native and browser surfaces separately where needed.
-
-### 3. Repair semantics at the source
-
-Prefer this order:
+Identify the actual observation and action paths when known:
 
 ```text
-native framework control
-  -> project design-system primitive with a tested semantic contract
-  -> custom control implementing the platform accessibility API
-  -> semantic representation for a custom-rendered domain surface
+shared application state
+  -> rendered pixels / DOM semantics / browser AX / native accessibility
+  -> consumer selection, projection and scope
+  -> model-visible observation
+  -> resolved target and input/action delivery
+  -> application transition, commit or failure
+  -> new observation; retained evidence only when history is in scope
 ```
 
-For every user-operable control, expose:
+Record relevant app/client versions, model adapter, platform, surface and access.
+An SDK tree method need not feed the model; DOM role matching need not equal
+browser AX; an AX target need not receive a native accessibility action.
 
-- correct role or control type;
-- useful accessible name, matching the visible label where one exists;
-- state and value (`checked`, `selected`, `expanded`, `pressed`, `busy`,
-  `disabled`, validation state, current item, range value);
-- supported actions and keyboard behavior;
-- relationships (`labelledby`, `describedby`, owner, parent, controls);
-- focus ownership and focus restoration;
-- a stable business identifier when the framework supports one.
+If no consumer is specified or available, proceed with the application's native
+semantics and normal interaction contract. Use an available authorized inspector
+or synthetic fixture where useful, and label interoperability untested. Do not
+install a consumer or require a product-wide audit to repair one button.
 
-Read `references/developer-checklist.md` for the detailed requirement matrix.
-Read `references/platform-patterns.md` for framework-specific implementation
-patterns.
+## 2. Find Where the Contract Breaks
 
-For Web, React, Web Components or Electron renderers, read
-[web-ax-dom.md](references/web-ax-dom.md). Diagnose computed names, DOM versus
-browser AX coverage, input behavior, hydration and frame/shadow scope before
-adding attributes. Use its optional synthetic probes for consumer-boundary
-research; a single-control repair only needs the relevant application tests.
-When targeting a named client such as TryCua or Codex, also read
-[web-consumers.md](references/web-consumers.md). Identify the selected
-model/adapter and actual observation payload before declaring AX requirements.
+Compare the failing task at adjacent layers. Choose a targeted observation or
+experiment that can distinguish causes before adding attributes.
 
-### 4. Make workflows discoverable, not merely clickable
+| Evidence | Likely owner to investigate |
+|---|---|
+| Visible label, role, focus or state is wrong in the component | Application primitive or owning view |
+| Application semantics are correct but platform output is absent/wrong | Framework or platform bridge |
+| Raw semantics are correct but the model gets a subset, summary or no tree | Consumer configuration, projection or host forwarding |
+| Correct target is observed but input goes elsewhere or is rejected | Target lifetime, action backend, focus or runtime support |
+| Input arrives but state/commit is wrong | Application event, validation or persistence path |
+| Operation succeeds but history loses its source or outcome | App observability, event capture or reconstruction; inspect each separately |
 
-Ensure:
+These are diagnostic leads, not automatic blame assignments. Empty, denied,
+truncated, redacted and unsupported observations are different states.
+Inspect the actual frame/window and current document before inferring missing
+semantics. Preserve correct markup when a downstream client drops information.
 
-- web documents have a clear primary `main`; evaluate embedded documents and
-  nested application roots separately, and do not impose HTML landmarks on
-  native windows;
-- nested pages use named regions, not additional `main` landmarks;
-- neighboring actions with the same visible verb are disambiguated;
-- tabs, navigation, selections, disclosures, and toggles expose current state;
-- menus expose their items only through the real open state;
-- dialogs are named, modal when appropriate, focus-trapped, and restorable;
-- drag-only workflows have keyboard or command alternatives;
-- virtualized lists expose the visible rows, position/count context, and stable
-  selection without hiding actionable descendants;
-- sensitive fields expose their role without leaking secrets.
+For broad requests, derive coverage from source-defined workflows and shared
+component call sites. Include critical loading/error, modal, large-data,
+responsive and platform states. Prioritize shared causes, then owning views;
+do not equate a few screenshots with full-product coverage.
 
-### 5. Add Computer Use-specific guarantees
+## 3. Implement at the Owning Layer
 
-Design each action so an agent can:
+Use native controls and existing design-system primitives first. For custom
+controls or rendered objects, expose platform-supported semantics from the same
+state and command path that rendering uses. Do not maintain a second hidden
+agent UI or independent semantic object model.
 
-1. observe a unique target;
-2. invoke an action addressed to that semantic target;
-3. re-observe fresh state;
-4. verify an action-specific effect.
+Maintain these application contracts:
 
-Do not accept transport success alone. Verify expected changes such as focus,
-selection, value, dialog/window creation, row count, persisted data, or a
-business-domain oracle.
+- Understand: useful visible and accessible labels, structure, values and
+  relationships let the user identify the object and its current state.
+- Act: focus, keyboard/pointer behavior, permissions, validation and supported
+  actions agree with that state. ARIA declarations do not implement behavior.
+- Verify: pending, committed, failed and unknown outcomes remain distinguishable.
+  Use an independent test oracle when the task promises persistence.
+- Attribute, when history matters: document/window identity and meaningful
+  transitions remain observable without exposing secrets or fabricating events.
 
-Fail closed when the target is missing, duplicated, stale, disabled, obscured,
-or unverifiable. Do not silently fall back from a failed semantic action to an
-old coordinate.
+Use scoped object context for repeated labels. Keep domain identity separate
+from ephemeral action references; re-resolve after relevant mutations. Spatial
+operations may use current geometry, while ordinary commands should also have
+usable semantic/keyboard access. Do not force a pointer failure to pass or
+blindly replay a timed-out mutation.
 
-Separate stable domain identity from runtime node IDs and snapshot indexes.
-After navigation, row recycling, reload, or window replacement, resolve again.
-AX grounding does not prove AXPress delivery: the client may use native actions,
-CDP input, DOM operations, or PID-scoped events. Verify the path the supported
-client actually uses; a transport ACK or `isTrusted` flag is not a business
-effect. Do not require the app to reimplement the runtime's revision protocol.
+Only change the authorized owner. If the application is correct and the
+consumer loses its tree, an app patch may be unnecessary. Report the integration
+gap and complete independent app work; do not smuggle runtime changes into an
+accessibility repair.
 
-For hybrid surfaces, text input, transient failures, or replay tests, read
-`references/consumer-contract.md`. It contains the ownership boundaries,
-failure cases, and a concrete observe/act/verify example.
+Keep semantics in the existing render/state lifecycle. No new global DOM scans,
+polling, duplicated content or eager-loading of unrelated views merely to feed
+an agent. Preserve secure-field behavior and sanitize diagnostics; hidden text
+and custom privacy attributes are not general exclusion mechanisms.
 
-### 6. Protect performance and loading behavior
+## 4. Validate the Task, Then Report the Claim
 
-Do not add a production DOM/AX walker, global `MutationObserver`, timer, polling
-loop, OCR model, or accessibility dependency merely to "improve semantics."
+Use [Verification](references/verification.md) to match tests to the changed
+contract and uncertainty. Reuse the same task, object and outcome across baseline
+and candidate. Test a relevant adverse case such as remount, delayed commit,
+modal interference or focus change, not only the default state.
 
-Prefer native attributes and framework APIs that are already part of rendering.
-Keep expensive tree traversal in tests and developer tooling.
+Separate source/component evidence, platform observation, actual consumer
+delivery and business outcomes. The included Chromium lint and synthetic Web
+probes are diagnostic aids; neither certifies an application or a recorder.
 
-Preserve lazy loading. Opening one page must not import every settings panel,
-inspector, or accessibility fixture.
-
-Avoid both extremes:
-
-- enormous trees full of decorative nodes;
-- aggressive pruning that removes actionable or state-bearing descendants.
-
-### 7. Verify in layers
-
-Use all applicable layers:
-
-1. Existing framework-aware source checks for unnamed controls, generic clickable elements,
-   invalid ARIA/UIA contracts, positive tab order, and untranslated labels.
-2. Component tests for role/name/state/value and keyboard behavior.
-3. Story/state catalog that opens interaction-driven final states.
-4. Real runtime tree audit across all routes and responsive breakpoints.
-5. End-to-end semantic actions with fresh observation and effect verification.
-6. Native inspector spot checks on each supported operating system.
-7. Packaged-app smoke when packaging, signing, sandboxing, or process
-   boundaries can alter accessibility.
-
-Read `references/verification.md` for the coverage matrix and completion gate.
-Choose tests by blast radius. Do not introduce a new regex gate where the
-project deliberately removed one. A broad readiness audit requires broad
-coverage; a single-control repair does not require auditing the entire product.
-
-Read `references/evidence-and-ecosystem.md` when choosing interoperability
-tests or reviewing the public-source rationale. Its dated findings are
-design inputs, not dependencies on any particular CU runtime.
-
-## When Activity History Is the Goal
-
-Read [history-readiness.md](references/history-readiness.md) when the request
-concerns recording, task reconstruction, or app changes for Computer History.
-Use its [test plan](references/history-readiness-test-plan.md) for relevant
-baseline/candidate comparisons, not for ordinary single-control repairs.
-
-Separate readable state, observable changes, and correct source attribution.
-Verify app/window/document/frame identity, focus and selection, asynchronous
-outcomes, privacy boundaries, and missing intervals on the supported consumer.
-A snapshot lint cannot validate a recording pipeline or reconstruction quality.
-
-Keep app fixes, OS/bridge integration, recorder guarantees, and summary quality
-separate. Use synthetic fixtures or existing authorized evidence. Do not enable
-recording, read personal activity, or change retention just to validate this
-skill. History lookup belongs to the user's history tool, not this workflow.
-
-## Deliverables
-
-For a read-only audit, report measured coverage, defects with evidence, and
-unverified areas. Audit completion does not mean the product passed readiness.
-Do not edit source/tests or perform state-changing actions to satisfy a repair
-gate. Use existing evidence or explicitly authorized probes.
-
-For an authorized repair, leave:
-
-- a source and runtime coverage inventory;
-- root-cause fixes in shared primitives or owning pages;
-- focused tests that fail on the original semantic defect;
-- a runtime accessibility-tree audit;
-- documentation of unsupported custom-rendered areas and residual risk;
-- an explicit performance statement covering dependencies, observers, polling,
-  bundle loading, and tree size.
-
-Do not report full coverage beyond the measured source-defined and runtime
-states.
+Report what changed or what the audit found, the layer responsible, the measured
+scope and evidence, and the remaining constraints. Say whether the result is
+source-verified, platform-tested, consumer-tested or history-tested as supported;
+these claims are independent, not a single readiness score. If a required check
+cannot run, explain that gap instead of marking it passed.

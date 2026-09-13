@@ -5,15 +5,15 @@
 [![Tests](https://github.com/hqhq1025/better-ax-for-computer-use/actions/workflows/test.yml/badge.svg)](https://github.com/hqhq1025/better-ax-for-computer-use/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Better AX for Computer Use is an open-source accessibility engineering skill
-for AI coding agents. It helps developers audit and improve accessibility
-trees, DOM/ARIA semantics, target identity, and action verification in web,
-Electron, and native applications whose source they can modify.
+Better AX for Computer Use is an open-source skill for designing, auditing and
+repairing applications that Computer Use agents operate. It starts with a real
+task, traces what the consumer can observe and do, fixes the responsible
+application code, and verifies the promised outcome.
 
-Improve the app's real UI: meaningful controls, reliable state and focus,
-unambiguous targets, and actions whose effects can be verified. AX here covers
-browser accessibility trees and platform interfaces, including macOS AX,
-Windows UIA, and Linux accessibility bridges.
+Its scope includes visible UI, DOM/ARIA, browser accessibility trees, native
+AX/UIA interfaces, custom controls and app-side activity-history readiness.
+Visible and accessible representations share the application's real state and
+commands. Human accessibility remains part of the contract.
 
 This is a developer workflow with a small Chromium AX audit tool. It is not a
 computer-control runtime, external adapter, or accessibility certification.
@@ -68,25 +68,35 @@ Client-specific discovery and invocation syntax may differ.
 
 ## Workflow
 
-1. Inventory the requested surfaces and states.
-2. Inspect what the actual accessibility consumer sees.
-3. Repair semantics in the owning controls and authoritative application state.
-4. Verify target identity, scope, focus, and supported actions.
-5. Re-observe and assert the intended business effect.
-6. Report measured coverage and remaining gaps.
+1. Define the task, object, initial conditions and evidence of success.
+2. Trace adjacent layers to find where information, identity or behavior fails.
+3. Repair the owning application component or design its contract before building.
+4. Repeat the task and a relevant adverse case; report exactly what was verified.
 
-| Concern | Requirement |
+```text
+shared app state -> pixels / DOM / platform accessibility
+                -> consumer projection -> model-visible observation
+                -> target and delivery -> application result
+                -> new observation / authorized retained evidence
+```
+
+| Decision | What the skill does |
 |---|---|
-| Read-only audits | Findings do not authorize source edits or state-changing probes |
-| Custom rendering | Native virtual semantics share the rendering state and action path |
-| Target identity | Domain IDs are distinct from temporary node references |
-| Multiple documents | Evaluate real document/frame/application scopes separately |
-| Input and saving | Check controlled state and persistence, not only the visible value |
-| Timeouts | Reconcile the outcome before retrying; no blind duplicate mutations |
-| Record/replay | Re-resolve semantic targets instead of replaying old indexes or points |
+| One-control repair | Focused regression, without a mandatory product-wide audit |
+| New or custom UI | Define object, state, actions, focus and outcomes using the existing state/command path |
+| Broad readiness request | Derive coverage from source workflows and shared call sites, not screenshots alone |
+| No selected consumer | Improve standard app semantics and behavior; leave interoperability untested |
+| Consumer drops correct semantics | Report the downstream gap; an app patch may be unnecessary |
+| Unknown mutation result | Reconcile terminal outcome or existing idempotency before retry |
+| History request | Separate readable app state, retained transitions and supported reconstruction |
+
+Evidence is reported by claim: component/source, platform, consumer workflow,
+business outcome and history. A passing label assertion is not a recording
+test; a successful screenshot workflow is not proof of native AX support.
 
 Source-unmodifiable applications require a separately scoped adapter task.
-The skill does not install private APIs, an MCP server, or a hidden agent UI.
+Audits remain read-only. The skill does not install private APIs, a control
+runtime, an MCP server, or a hidden agent UI.
 
 ## Web AX and DOM
 
@@ -212,9 +222,10 @@ specified path and overwrites an existing file.
 ## Guides
 
 - [Skill entry point](SKILL.md)
-- [Developer checklist](references/developer-checklist.md)
+- [Component and workflow contracts](references/developer-checklist.md)
 - [Platform patterns](references/platform-patterns.md)
 - [Web AX/DOM diagnostics and repair](references/web-ax-dom.md)
+- [TryCua and Codex consumer profiles](references/web-consumers.md)
 - [Consumer contract and negative cases](references/consumer-contract.md)
 - [Activity history readiness](references/history-readiness.md)
 - [Synthetic history test plan](references/history-readiness-test-plan.md)
@@ -279,11 +290,14 @@ for the mechanisms that informed this skill.
 
 ## Validation and Contributions
 
-The initial release includes 46 offline tests covering tree validation,
-document scope, target selection, cleanup, and CLI behavior. Browser capture
+The repository checks cover tree validation, document scope, target selection,
+cleanup, CLI behavior and documentation integrity. Browser capture
 tests use injected fakes; they do not replace real-browser or native-app E2E
 validation. Text-based skill scenario checks likewise do not establish live
 application compatibility.
+
+Use [skill evaluation scenarios](references/skill-evaluation.md) to forward-test
+instruction changes separately from script tests.
 
 For changes, run all repository checks:
 

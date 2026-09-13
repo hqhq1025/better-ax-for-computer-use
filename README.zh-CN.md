@@ -5,13 +5,14 @@
 [![Tests](https://github.com/hqhq1025/better-ax-for-computer-use/actions/workflows/test.yml/badge.svg)](https://github.com/hqhq1025/better-ax-for-computer-use/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Better AX for Computer Use 是面向 AI 编程代理的开源无障碍工程 skill。
-它帮助开发者改善源码可改应用的可访问性树（AX）、DOM/ARIA 语义、目标身份、
-焦点和动作结果验证，让 Computer Use 代理能够理解并操作真实界面。
+Better AX for Computer Use 是面向 AI 编程代理的开源应用工程 skill。
+从真实任务出发，定位信息、身份或交互在哪一层失效，在负责该行为的应用代码中
+修复，再验证用户承诺的结果。支持审计、局部修复和新组件设计。
 
 这里的 AX 不只指 macOS Accessibility，也包括浏览器可访问性树、Windows UI
 Automation 等平台接口。项目提供开发工作流、平台指南和一个轻量 Chromium AX
-审计脚本，不是电脑控制运行时，也不是无障碍认证工具。
+审计脚本，不是电脑控制运行时，也不是无障碍认证工具。可见界面和可访问性表示
+使用同一份真实状态与命令，人类可访问性仍是要求的一部分。
 
 ## 适用场景
 
@@ -52,12 +53,30 @@ git clone https://github.com/hqhq1025/better-ax-for-computer-use.git \
 
 ## 工作流
 
-1. 确定本次范围，盘点界面、控件和条件状态。
-2. 检查实际消费者能读到的语义树，明确缺失的 frame 或窗口。
-3. 在控件及权威应用状态中修复名称、角色、状态、动作和焦点。
-4. 区分业务对象 ID 与临时节点引用，重新解析当前目标。
-5. 执行动作后重新观察，核对具体业务效果。
-6. 报告实际覆盖范围、测试结果及剩余风险。
+1. 明确任务、操作对象、初始条件及成功证据。
+2. 比较相邻层的输入输出，找出信息、身份或行为失效的位置。
+3. 修改负责该行为的组件；新组件先定义交互约定，再实现。
+4. 用同一任务和相关异常状态验证，报告证据支持的具体结论。
+
+```text
+共享应用状态 -> 像素 / DOM / 平台可访问性
+             -> 消费者筛选 -> 模型实际输入
+             -> 目标解析与动作投递 -> 应用结果
+             -> 新观察 / 已授权的历史证据
+```
+
+| 情况 | 如何处理 |
+|---|---|
+| 只修一个控件 | 聚焦回归，不要求全产品审计 |
+| 新组件或自绘界面 | 从对象、状态、动作、焦点和结果设计，共享既有状态与命令 |
+| 全应用优化 | 从源码流程和共享组件调用点确定覆盖范围 |
+| 尚未选择消费者 | 继续完善标准语义和真实行为，标明互操作未验证 |
+| 消费者丢弃正确语义 | 明确下游问题，允许应用零改动 |
+| 写操作结果未知 | 核对终态或既有幂等保障后再决定重试 |
+| 改善 History | 分开验证应用状态、保留的变化和可支持的任务重建 |
+
+源码、平台输出、消费者操作、业务结果和历史质量分别陈述，不合并为一个
+“readiness 分数”。标签测试通过不能证明录制有效，截图操作成功也不证明原生 AX 可用。
 
 只读审计不授权修改源码或执行改变状态的探测。源码可改的自绘界面可以在应用内
 修复；不可内修的闭源目标需要另行确定外部 adapter 任务。
@@ -158,8 +177,10 @@ node ~/.agents/skills/better-ax-for-computer-use/scripts/audit_chromium_ax.mjs \
 | AppKit / SwiftUI | 原生控件、虚拟语义、持久化路径指南 | 原生测试运行器 |
 | Windows UIA / Qt / GTK | 控件类型、动作、状态和平台桥接指南 | 各平台完整端到端验证 |
 
-原有 46 项审计工具测试使用离线 fixture 和 fake browser。
+审计工具测试使用离线 fixture 和 fake browser，另有文档完整性检查。
 文档中的平台覆盖不等于这些平台已经通过真实应用测试。
+修改 skill 指令时，可使用[前向测试场景](references/skill-evaluation.md)
+验证其判断和范围控制，不能仅凭脚本测试通过。
 
 ## 常见问题
 
@@ -189,9 +210,10 @@ node ~/.agents/skills/better-ax-for-computer-use/scripts/audit_chromium_ax.mjs \
 详细指南目前使用英文：
 
 - [Skill 入口](SKILL.md)
-- [开发检查表](references/developer-checklist.md)
+- [组件与工作流约定](references/developer-checklist.md)
 - [平台实现模式](references/platform-patterns.md)
 - [Web AX/DOM 诊断与修复](references/web-ax-dom.md)
+- [TryCua 与 Codex 消费路径](references/web-consumers.md)
 - [消费者契约与负例](references/consumer-contract.md)
 - [活动历史可记录性](references/history-readiness.md)
 - [合成历史测试计划](references/history-readiness-test-plan.md)

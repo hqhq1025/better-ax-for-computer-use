@@ -1,4 +1,4 @@
 interface:
   display_name: "Better AX for Computer Use"
-  short_description: "Improve app semantics for Computer Use and history"
-  default_prompt: "Use $better-ax-for-computer-use to audit and improve this app's accessibility semantics and verify its Computer Use workflows."
+  short_description: "Design and repair apps around verifiable Computer Use tasks"
+  default_prompt: "Use $better-ax-for-computer-use to improve this app's requested workflow, locate the failing layer, repair its owner, and verify the outcome."

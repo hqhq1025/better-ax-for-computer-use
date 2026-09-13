@@ -1,147 +1,107 @@
-# Consumer Contract and Regression Cases
+# Observation, Action and Outcome Boundaries
 
-Use this when the app spans rendering backends, when a tree looks correct but
-actions fail, or when building reusable workflow tests. These are engineering
-acceptance criteria, not a claim that every CU runtime enforces them.
+Use this when a correct-looking interface fails in a Computer Use workflow,
+when targets can change, or when an operation's result is uncertain.
+These are diagnostic and acceptance criteria, not claims that all clients
+enforce the same protocol. For known implementations, consult
+[Consumer profiles](web-consumers.md) and verify the deployed version.
 
-## Ownership
+## Trace the Actual Data
 
-| Layer | Owns | Check without expanding scope |
+| Boundary | Ask | Inspect |
 |---|---|---|
-| Application | Role, name, state, value, relationships, focus, actions, domain meaning | Fix the owning component and authoritative state |
-| Platform bridge | DOM/ARIA to Chromium AX; framework to macOS AX/UIA/AT-SPI | Inspect the emitted runtime tree |
-| CU observation client | Filtering, node indexes, revisions, scope, partial results | Check what the actual client sees, not only the raw tree |
-| CU executor | Refetch, action routing, input delivery, settling, permissions | Run the supported client path and record limits |
-| Test harness | Fixtures, effect oracle, retry reconciliation, safe traces | Assert workflow outcomes independently of transport ACKs |
+| Application to representation | Does the UI express the right object and state? | Rendering state, DOM/native semantics, focus, shared command |
+| Representation to consumer | What was retained, omitted or transformed? | Pixels, DOM result, AX output, scope, redaction and completeness |
+| Tool result to model | Did the model receive the useful payload? | Actual message/structured-result forwarding, not just tool availability |
+| Observation to action | Is this still the intended object in the intended surface? | Current reference, scope, document/window lifetime, action support |
+| Delivery to application | What actually arrived and where? | Native action, DOM operation, keyboard or coordinate event and recipient |
+| Application to outcome | Was the promised effect committed or rejected? | State transition, error, persistence or other task-specific oracle |
 
-Do not add a production observer or private command server just to compensate
-for a test client that cannot read existing semantics. Conversely, a named
-control is not sufficient if it cannot be reached or acted on by the intended
-client. Report which layer owns the remaining gap.
+Compare adjacent boundaries to locate the loss. If runtime access is unavailable,
+use source evidence and mark the missing boundary; do not invent observations.
+Correct app semantics plus a consumer omission may require zero app changes.
 
-## Observation and identity
+## Preserve Scope Without Inventing a Protocol
 
-Record available scope explicitly:
-
-```text
-native: app identity + PID/process lifetime + window identity
-browser: provider + context/tab + frame/document lifetime
-target: role/name/state + scoped domain identity + current runtime reference
-observation: time/revision if supplied + covered surfaces + errors/omissions
-```
-
-These are conceptual fields, not a required new wire schema. Do not invent
-revision tokens or process generations when the client does not expose them.
-
-- Accessible names describe controls; localized names are not durable IDs.
-- A domain ID preserves meaning across reflow, but does not authorize acting
-  on an old node reference.
-- DOM node IDs, AX element indexes, and UIA runtime IDs have backend-specific
-  lifetimes. Re-resolve after navigation, remount, virtualization, or window
-  replacement. Test that a recycled row does not target the previous object.
-- Same-named controls can be valid under distinct labeled rows or regions.
-  Test scoped resolution with the intended client before lengthening every name.
-- Missing frame coverage and inventory failures are incomplete observations.
-  Do not turn them into empty successful snapshots or silent coordinate input.
-
-## Actions and input
-
-Treat these as separate questions:
-
-1. How was the target identified?
-2. Which backend delivered the action?
-3. Which authoritative state proves the intended effect?
-
-A role/name locator can eventually dispatch pointer input. Browser value
-replacement may use a DOM operation while typing uses an input protocol. Native
-AX grounding can feed PID-scoped input. Do not label all of these `AXPress`.
-
-For text fields, test the app's controlled state, input/change/blur/submit
-behavior, and relevant IME/composition cases. Direct `.value` assignment can
-leave framework or persisted state unchanged. An event's `isTrusted` flag is
-diagnostic evidence, not the success oracle.
-
-For synthetic keyboard input, establish the exact receiving window and element
-at dispatch. If the mechanism relies on foreground input, verify foreground
-ownership too. Do not impose global foreground activation on a backend proven
-to deliver scoped input safely; do not infer safe scoped input from a PID alone.
-
-For spatial controls, use current geometry bound to the current target and
-scope, then verify the domain effect. A failed semantic lookup does not
-authorize replaying an old point.
-
-## Bounded recovery
-
-After a timeout or lost response, the effect is unknown. A rejected promise
-does not prove the underlying operation was cancelled.
-
-Re-observe and reconcile the specific effect before retrying. For a
-non-idempotent action such as create/delete/submit, stop if the result cannot
-be established. Do not issue duplicate mutations to discover what happened.
-Absence of an effect in one snapshot does not prove failure or prevent a late
-commit. Require a known terminal outcome or existing idempotency protection
-before retrying. Do not infer idempotency from an action's name, including Save.
-Where the application already has operation IDs or idempotency support, use
-that evidence in the test oracle without creating a new API for this skill.
-
-Stop a diagnostic probe when ownership is ambiguous, the user changes the
-active target, permission is denied, or evidence is unavailable. Report the
-boundary instead of disabling runtime checks.
-
-## Worked example
-
-Constructed test scenario, not a captured Codex trace:
+Record the scope fields the supported client actually provides:
 
 ```text
-Observation
-  Settings document, current runtime snapshot
-  textbox "Project name", value "Draft"
-  button "Save", enabled
-
-Action
-  Resolve the textbox within Settings; replace with "Demo"
-
-New observation
-  textbox value "Demo"; controlled app state also "Demo"
-
-Action
-  Re-resolve Save; activate through the supported client
-
-Verification
-  Busy state clears; after the defined commit completes, an independent
-  persistence read returns "Demo". A fresh instance without the prior
-  in-memory state still loads "Demo"
-
-Done
-  The UI state and persistence oracle agree; transport success alone
-  would not satisfy the test
+native: app + process lifetime + window
+browser: provider/context + tab + frame/document
+target: role/name/state + object context + current action reference
+observation: available time/revision + covered surfaces + errors/omissions
 ```
 
-Keep the independent oracle in tests. Do not expose test-only datastore access
-as a hidden agent control surface in the application.
+Do not fabricate epochs or require apps to implement the runtime's revision
+scheme. Backend IDs and tokens have backend-specific lifetimes. Re-resolve
+after navigation, remount, row recycling or window replacement, and confirm
+the business object as well as locator uniqueness.
 
-## Choose regression cases by risk
+Unavailable, empty, partial and privacy-suppressed are distinct observations.
+Missing iframe content is not evidence that the document contains no controls.
+A full snapshot and a diff have different baseline requirements.
 
-| Case | Required observation or outcome |
+If the target is ambiguous or stale, stop that mutation and obtain fresh
+evidence. A failed semantic lookup does not authorize reuse of an old coordinate.
+An inherently spatial task can use current target-bound geometry without
+pretending it has a DOM or native action node.
+
+## Test the Supported Input Method
+
+Keep target identification separate from delivery. A semantic ref can result
+in pointer input; replacement can use a native value setter or DOM operation;
+typing may use another input protocol. None of these is universally AXPress.
+
+For keyboard delivery, establish the actual receiving window and element.
+Verify foreground ownership when the backend depends on it; do not impose
+foreground activation on a verified scoped/background path. A PID alone is
+not proof of correct focus routing.
+
+For pointer delivery, check current geometry, display/frame mapping and
+interference. For semantic actions, check actual supported actions and guards.
+Method-specific success does not imply every pointer, keyboard or value-setter
+path is valid. Keep bypasses such as forced clicks separate from acceptance.
+
+An ACK, handler invocation, changed pixels or `isTrusted` flag can explain
+delivery. None independently proves a persisted or business-domain result.
+Test the component's real state and command path, including relevant editing,
+validation and commit behavior.
+
+## Reconcile Before Retry
+
+A timeout or lost response leaves the outcome unknown. Promise rejection
+does not establish cancellation; one unchanged snapshot does not exclude a
+late commit.
+
+Use fresh observation and an existing task-specific oracle to establish a
+terminal result. Retry mutations only after confirmed non-application or under
+verified existing idempotency protection. Do not infer idempotency from names
+such as Save. If the result remains unknown, stop mutation retries and report
+the missing evidence. Continue independent authorized work.
+
+Stop a probe when target ownership changes unexpectedly, permission is denied
+or the necessary observation is unavailable. Do not disable runtime checks
+or widen permissions to make a readiness result pass.
+
+## Worked Task
+
+Constructed example, not a captured client trace:
+
+| Step | Evidence |
 |---|---|
-| Two same-named rows | Scoped locator selects exactly the intended row |
-| Virtual row recycled | Old reference cannot silently change a different record |
-| Navigation/reload | New document observed before a new action |
-| Modal over editor | Modal owns interaction; background input is prevented |
-| Multiple windows/tabs | No implicit last-window/page selection |
-| Provider enumeration fails | Incomplete/unavailable is visible, not an empty UI |
-| Controlled input | Rendered, application, and persisted values agree |
-| Timeout with delayed effect | Reconcile to a known terminal outcome or use existing idempotency; otherwise stop |
-| Layout/scale/scroll changes | Refresh target and geometry |
-| User moves focus | No text delivered to an unverified recipient |
+| Observe | Settings for project Alpha; textbox "Name" contains "Draft" |
+| Resolve and edit | Current field belongs to Alpha; supported editing changes its draft state to "Demo" |
+| Submit | Re-resolved Save uses the application's guarded commit path |
+| Observe result | Pending becomes committed, or an actual error is shown |
+| Verify | Authorized test datastore/reload confirms Alpha is "Demo"; Beta is unchanged |
+| Uncertain branch | Lost response with no terminal evidence remains unknown; no duplicate submit |
 
-## Reusable traces
+The independent oracle belongs in the test harness, not an agent-only production
+API. Persistence is needed here because the task promised saving; a focus-only
+task would have a different oracle.
 
-When regression capture is requested or already exists, store semantic intent,
-target scope, relevant preconditions, action, expected effect, and observed
-outcome. Replays must freshly resolve targets. Do not persist runtime indexes
-or coordinates as durable selectors.
-
-Use synthetic records and minimal, redacted diagnostics. Screenshots, trees,
-typed text, account names, and URLs may contain private data. Do not enable
-background Computer History or record real user sessions as part of an AX fix.
+When authorized traces already exist, reuse semantic intent, object scope,
+preconditions and observed outcomes. Replays re-resolve targets; saved refs and
+points are not durable selectors. Use synthetic or minimized redacted artifacts.
+Record/replay is not permission to enable passive Computer History or retain
+personal sessions.

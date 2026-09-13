@@ -1,7 +1,7 @@
 {
   "name": "Better AX for Computer Use",
   "slug": "better-ax-for-computer-use",
-  "description": "An open-source accessibility engineering skill for AI coding agents, with source-level Computer Use and activity-history readiness guidance and a partial Chromium AX audit tool.",
+  "description": "An open-source skill for task-driven application design, accessibility repair, Computer Use consumer diagnosis and evidence-based verification, with app-side history guidance and a partial Chromium AX audit tool.",
   "repository": "https://github.com/hqhq1025/better-ax-for-computer-use",
   "license": "MIT",
   "maintainer": {"name": "Haoqing Wang", "url": "https://github.com/hqhq1025"},

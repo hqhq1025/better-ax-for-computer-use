@@ -1,202 +1,148 @@
-# Verification and Completion Gate
+# Verify the Claim You Intend to Make
 
-## Coverage inventory
+Choose evidence from the task and changed contract. A source repair, consumer
+integration result and history-quality result are independent claims. Do not
+collapse them into one readiness score or require every layer for a narrow fix.
 
-Create a table before claiming completion:
+## Define Comparable Baseline and Candidate
 
-| Surface | States | Actions | Runtime tree | Effect oracle |
-|---|---|---|---|---|
-| Main navigation | default/current/collapsed | open route | checked | route changed |
-| Settings page | loading/ready/error/narrow | edit/save | checked | persisted value |
-| Dialog | opening/open/error/closing | confirm/cancel | checked | mutation/closed |
-| Virtual list | empty/small/large/scrolled | select/open | checked | selection/content |
+For an existing defect, preserve the failing object, initial state, action and
+expected outcome. Change only the relevant implementation or explicitly scoped
+configuration. For new components, define expected behavior first and test
+both valid and invalid transitions.
 
-For an application-wide readiness claim, the inventory must include the
-following. For a scoped repair, record the changed surface and affected shared
-call sites, and explicitly exclude unmeasured areas:
+A compact record can be a test or a table:
 
-- every source-defined route/page;
-- every modal, sheet, menu, popover, and secondary window;
-- all critical conditional states;
-- responsive/narrow states;
-- long-content and large-data states;
-- custom-rendered areas;
-- platform-specific implementations.
+| Task and object | Initial/adverse state | Observation path | Action path | Expected result | Actual evidence / gap |
+|---|---|---|---|---|---|
+| Rename Alpha | ready, then delayed commit | specified DOM/AX/visual client | supported edit and submit | Alpha persisted, Beta unchanged | fill from executed checks |
+| Open dialog | opener later removed | relevant DOM/native tree | keyboard activation and dismiss | correct focus entry and sensible return | fill from executed checks |
 
-## Static verification
+These are examples, not mandatory workflows or a new machine-readable schema.
+A single-label repair can use a focused regression without a separate report.
 
-Search for:
+For product-wide work, enumerate source-defined routes, shared call sites,
+dialogs, menus, secondary windows, critical conditional states, large-data
+states and supported platforms. Mark measured, failed and untested coverage.
+Do not claim all surfaces from a representative sample.
 
-- clickable generic elements;
-- icon-only controls without names;
-- fields without persistent labels;
-- positive tab order;
-- invalid role/state combinations;
-- nested `main` landmarks;
-- untranslated accessibility strings;
-- design-system controls that bypass their required `label` contract.
+## Select Evidence by Failure Mode
 
-Prefer existing AST or framework-aware checks. Do not resurrect a deliberately
-removed regex gate. If an existing regex gate is maintained, use positive and
-negative fixtures and do not mistake it for runtime coverage.
-
-## Runtime tree verification
-
-Keep the evidence layers separate:
-
-| Evidence | Proves within tested scope | Does not substitute for |
+| Claim | Appropriate evidence | What it cannot establish alone |
 |---|---|---|
-| Playwright role/name/state and ARIA snapshot | DOM-derived semantic contract and browser interaction | Chromium AX output or native OS AX |
-| CDP AX capture | Chromium's exposed accessibility nodes | Electron native menus/windows or full cross-frame coverage |
-| Native AX/UIA/AT-SPI client | Platform bridge output and tested actions | Business effect or all supported OS versions |
-| Business oracle | Intended state change/persistence | Discoverability or accessible input path |
+| Source/component contract repaired | Framework-aware test of name/state and actual behavior; regression against original defect | Platform AX or named-client compatibility |
+| DOM consumer can resolve it | Scoped role/label result in the correct document/shadow scope | Browser AX equality or native bridge output |
+| Platform semantics exposed | Browser AX or native inspector, actual state and ownership | Model-visible projection or business success |
+| Named consumer can perform task | Actual projected observation, fresh target, supported action and expected outcome | Other adapters, versions or all application workflows |
+| Promise of persistence satisfied | Independent authorized datastore check or fresh load after commit | Accessible discovery or input delivery |
+| History readiness improved | Same synthetic task through app, capture and attribution checks | Accurate reconstruction without inspecting retained evidence |
+| Reconstruction improved | Independent reader given permitted evidence, compared with task ground truth | Capture completeness or privacy outside tested paths |
 
-Critical role-specific state must be asserted in component or workflow tests.
-A lint report that leaves missing state as a warning does not waive it.
+When runtime access is unavailable, report source-level results and the exact
+untested boundary. Do not fabricate a pass or install an inspector/recorder
+without authority. A source-only audit can finish with open runtime questions.
 
-For each final state:
+## Exercise the Changed Contract
 
-- activate the platform accessibility subsystem;
-- capture the tree;
-- fail on unnamed actionable nodes;
-- inspect main landmarks within each document/application scope; review
-  multiple mains and their labels instead of failing across unrelated frames;
-- inspect duplicate role/name pairs for ambiguity;
-- confirm current/selected/expanded/checked/busy/invalid/value state;
-- confirm focused element and focused window;
-- confirm hidden/inert surfaces are absent or ignored;
-- confirm every visible critical action has a semantic node.
+Use the real interaction-driven state, not merely a story URL or a component
+that never opens its menu. Capture loading/error states deliberately; fixed
+sleeps are not application readiness.
 
-For Chromium/Electron:
+Select the relevant checks:
 
-Use [web-ax-dom.md](web-ax-dom.md) to diagnose DOM/browser AX divergence,
-computed names, hydration and frame/shadow coverage. Its optional real-browser
-probes verify synthetic method boundaries, not the target application's
-semantics, assistive-technology behavior or full platform coverage.
+- Naming/structure: inspect computed names and relationships, ambiguous scoped
+  targets, reading content and true document/application boundaries.
+- Input: verify applicable keyboard/pointer behavior, focused recipient,
+  rendered and framework state, validation and promised commit. Add real IME
+  or rich-text checks only when relevant; fill is not a substitute.
+- Modal/composite behavior: distinguish active item, selection and focus;
+  verify actual background isolation and sensible focus return.
+- Identity: repeat with duplicate labels, sorting, remount or recycled rows
+  where these can redirect the operation.
+- Consumer coverage: compare raw output with actual model input; identify
+  omitted frames, unsupported fields, redaction, budgets and required baselines.
+- Outcomes: observe the specific object and expected effect. Include a failed
+  or delayed result where the change affects commit/retry behavior.
+
+For visual consumers, verify visible discovery and current geometry; do not
+pretend the model saw an AX name. Still preserve and test the application's
+accessibility contract. For semantic consumers, also inspect the projection;
+a raw-tree pass cannot replace it.
+
+Reference freshness and fail-closed target resolution belong to the consumer.
+Cancellation crosses layers: stopping a local wait or sending a cancel request
+does not prove the application or server stopped its operation. Test the
+relevant boundary, but do not claim ARIA fixes establish these guarantees.
+For unknown outcomes, follow
+[Consumer contract](consumer-contract.md).
+
+## Use the Tools for Their Limited Purpose
+
+From this repository, offline synthetic checks need only Node.js:
 
 ```sh
-node scripts/audit_chromium_ax.mjs --url http://127.0.0.1:3000
-node scripts/audit_chromium_ax.mjs --cdp http://127.0.0.1:9222 --page-title "My App"
+node scripts/audit_chromium_ax.mjs --tree-file examples/ax-before.json
+node scripts/audit_chromium_ax.mjs --tree-file examples/ax-after.json
+node --test scripts/*.test.mjs
 ```
 
-Run these from the target workspace so its Playwright package can be resolved;
-use an absolute script path when needed. CDP access requires authorization and
-an already exposed debugging endpoint. Do not enable it on a user's app merely
-to run an audit. Use synthetic fixtures for captured trees and output files.
+The before fixture exits 1; the after fixture exits 0 for limited tree checks.
+Neither is an application workflow. The lint detects an empty effective tree
+and unnamed actionable nodes; contextual warnings still need review. It cannot
+establish visible-control coverage, full frames/OOPIF, native AX, focus, action
+delivery, privacy or business effects.
 
-This helper checks a limited role/name/state subset. It cannot prove every
-visible control is present, OOPIF coverage, focus, supported actions, geometry,
-privacy, freshness, or workflow success. Empty, malformed, or unavailable
-observations must not count as passes.
+For permitted live Chromium capture, run from the target workspace with an
+absolute path to the installed audit script so its Playwright can be resolved:
 
-Run Storybook interaction/play steps before capturing final states. A screenshot
-or story URL alone does not establish that the menu/dialog was opened. Test
-narrow layouts below the actual breakpoint and capture loading/error states
-deliberately rather than trusting a fixed sleep.
+```sh
+node ~/.agents/skills/better-ax-for-computer-use/scripts/audit_chromium_ax.mjs \
+  --url http://127.0.0.1:3000
+```
 
-## Interaction verification
+Connecting to an existing CDP endpoint also requires authorization and exact
+page selection. Do not enable debugging on a user app just to run the lint.
+See the repository README for CLI options and output/privacy behavior.
 
-For each critical action:
+Use [Web AX/DOM](web-ax-dom.md)'s optional synthetic browser probes only to
+investigate those method boundaries. They create isolated fixtures and have
+separate browser dependencies; they do not test the target application.
+Prefer existing framework-aware checks over adding regex-based semantic gates.
 
-1. Capture the exact target window and current tree.
-2. Resolve one unique semantic node.
-3. Invoke the supported client's target-addressed action.
-4. Capture a fresh tree.
-5. Assert an action-specific effect.
+## Check Cost and Exposure
 
-Examples:
+Inspect changed production dependencies, event subscriptions/observers, tree
+construction and lazy-loading behavior. For shared primitives or large custom
+surfaces, compare small/large states, node volume and observation latency where
+relevant. A label-only change does not need an unrelated performance campaign.
 
-- click tab -> selected tab and visible panel change;
-- toggle -> checked/pressed state and persisted setting change;
-- submit -> dialog closes and record count increases;
-- type -> focused field owns the value;
-- delete -> target record disappears;
-- open secondary window -> exact new window and content appear;
-- scroll -> visible range and domain position change.
+Use synthetic values and minimized diagnostics. Inspect retained test artifacts
+for secrets, typed text, titles, URLs, selections and screenshots. Correct
+password semantics alone do not certify privacy. Do not enable background
+recording for ordinary application verification.
 
-Do not verify success with "some pixels changed."
+When history is requested, use [History readiness](history-readiness.md) and
+its [test plan](history-readiness-test-plan.md). Check changes, source attribution,
+missing intervals, policy and reconstruction separately. A clicked Save cannot
+be upgraded to "saved" by a recorder or summary without outcome evidence.
 
-Keep locating, delivery, and verification in separate trace fields. When
-delivery is unknown, record it as unknown. For text, verify controlled state
-and persisted value, not just the rendered input's `.value`; include relevant
-input/change/blur/submit and composition behavior.
+## Close with the Right Scope
 
-Add relevant negative cases from `consumer-contract.md`: duplicate rows,
-recycled nodes, navigation, multiple windows, covered controls, focus moved by
-the user, failed observation, timeout with delayed effect. If the runtime cannot
-enforce a boundary, document it rather than attributing the guarantee to AX.
+An audit completes when it reports evidence-backed findings, responsibility and
+coverage limits. It need not repair defects or run unauthorized interactions.
 
-## Keyboard and focus verification
+Design-only work completes with the requested contract, tradeoffs and acceptance
+cases; do not imply implementation or live validation occurred.
 
-Test:
+For a repair or build, distinguish code implemented, checks passed and required
+verification blocked. A stated blocker does not complete the overall request
+when that verification is required. Continue independent authorized work, then
+report exactly what remains and what would unblock it. Unrequested consumer
+certification need not block a component fix. Name residual consumer constraints
+separately from unresolved app defects; never count a missing check as a pass.
 
-- Tab/Shift+Tab order;
-- arrow-key behavior in composite controls;
-- Enter/Space activation;
-- Escape dismissal;
-- focus entry into dialogs;
-- focus restoration;
-- no focusable nodes inside inert/hidden surfaces;
-- no keyboard input unless focused element ownership is provable.
-
-## Performance verification
-
-Record:
-
-- production dependencies added;
-- new observers, timers, polling, OCR, or tree scans;
-- initial and route-level bundle changes;
-- whether unrelated panels are still lazy;
-- tree node count in small and large states;
-- observation latency in large states.
-
-Treat production full-tree synthesis for ordinary controls as a design failure.
-
-## Privacy verification
-
-Inspect logs, traces, screenshots, CI artifacts, and persisted sessions for:
-
-- passwords and secure values;
-- typed text;
-- raw accessibility values;
-- coordinates;
-- window titles and account names;
-- private URLs and tokens.
-
-Sanitize or disable persistence by default.
-
-## Optional demonstration-derived regressions
-
-When demonstrations or replay tests are already available, extract semantic
-targets, preconditions, actions, and expected effects from a sanitized trace.
-Flag missing semantic targets as gaps rather than preserving coordinates.
-Replay from a fresh observation with changed row order or window position.
-Report capture quality, target resolution, execution, and verified outcome
-separately. Generating a replay skill is not proof that its workflow succeeds.
-Do not add recording infrastructure unless requested.
-
-## Completion gate
-
-When history quality is requested, use the separate
-[history-readiness guide](history-readiness.md) and
-[synthetic test plan](history-readiness-test-plan.md). Verify state readability,
-change observation, source attribution, privacy and reconstruction independently.
-Neither an AX lint pass nor a successful action proves that the recorder retained
-the transition or that a summary recovered the supported outcome.
-
-An audit is complete when its requested scope, evidence, findings, and coverage
-limits are reported. Defects and missing runtime evidence do not require
-unauthorized repairs or interactions; label source-only or partial conclusions.
-
-For an authorized repair, report that the measured scope passes readiness only
-when:
-
-- the requested scope's source inventory is complete and quantified;
-- all measured final states pass the runtime tree gate;
-- every critical action has a semantic path and an effect oracle;
-- missing/ambiguous/stale targets fail closed;
-- keyboard and focus behavior passes;
-- custom-rendered gaps are repaired or explicitly documented;
-- packaged/native platform checks pass where relevant;
-- performance and privacy impacts are stated;
-- residual unmeasured states are listed instead of hidden.
+State what changed, what task/state/client was tested, what the evidence proves,
+and what remains untested. Reserve a consumer-readiness claim for the actual
+tested path and version. Reserve history/reconstruction claims for evidence
+from those pipelines. Preserve exact test results instead of a generic "all
+accessible" conclusion.

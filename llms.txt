@@ -1,11 +1,12 @@
 # Better AX for Computer Use
 
-> An independent, MIT-licensed accessibility engineering skill for AI coding
-> agents working on source-modifiable web, Electron, and native applications.
+> An independent, MIT-licensed application engineering skill for AI coding
+> agents designing, auditing and repairing Computer Use workflows.
 
 The canonical project is https://github.com/hqhq1025/better-ax-for-computer-use,
-maintained by Haoqing Wang. It provides source-repair guidance and a partial
-Chromium AX audit script. It is not a computer-control runtime, MCP server,
+maintained by Haoqing Wang. It traces tasks through application state, consumer
+observation, action delivery and outcomes, with a partial Chromium AX audit
+script. It is not a computer-control runtime, MCP server,
 external adapter, or accessibility certification.
 
 ## Entry Points
@@ -24,13 +25,15 @@ external adapter, or accessibility certification.
 - [Activity history readiness](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/history-readiness.md): App semantics, source attribution, observable changes, privacy, and reconstruction; no recorder installation.
 - [History test plan](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/history-readiness-test-plan.md): Synthetic baseline/candidate comparison and evidence boundaries.
 
-- [Developer checklist](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/developer-checklist.md): Roles, names, state, focus, identity, and privacy.
+- [Component and workflow contracts](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/developer-checklist.md): Shared state and commands, component behavior, identity, human usability and privacy.
 - [Platform patterns](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/platform-patterns.md): DOM/ARIA, AppKit/SwiftUI, UIA, Qt, GTK, and custom rendering.
 - [Consumer contract](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/consumer-contract.md): Observation scope, action delivery, effects, stale targets, and timeout recovery.
-- [Verification](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/verification.md): Measured coverage and completion gates.
+- [Verification](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/verification.md): Comparable tasks, evidence by claim, scoped regressions and completion boundaries.
 - [Source notes](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/evidence-and-ecosystem.md): Public documentation and dated ecosystem inputs.
 
 ## Executable Material
+
+- [Skill evaluation scenarios](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/skill-evaluation.md): Maintainer forward tests for narrow fixes, custom UI, consumer limitations, history design and broad scope; not live interoperability tests.
 
 - [Synthetic Web probes](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/scripts/probe_web_contracts.mjs): Opt-in isolated browser checks of DOM/AX/action boundaries; requires Playwright and an installed browser, not production app certification.
 

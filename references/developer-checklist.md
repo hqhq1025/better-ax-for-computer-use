@@ -1,161 +1,105 @@
-# Developer Checklist
+# Component and Workflow Contracts
 
-Use this as the detailed implementation and review matrix.
+Use this when designing or repairing an application's controls. Select rows
+matching the requested component; do not impose the entire matrix on every
+change. For existing UI, trace the shared primitive and affected call sites.
+For new UI, define expected state transitions before choosing markup.
 
-## 1. Window and document structure
+## One State and Command Path
 
-- Expose the application, exact window, title, and modal relationship.
-- Prefer one primary `main` in each web document/application scope; count
-  nested documents separately. Use native window semantics for native apps.
-- Use named regions for nested pages, inspectors, sidebars, and work areas.
-- Give each page/dialog/window a distinct name.
-- Preserve a useful heading hierarchy.
-- Mark decorative content as decorative instead of giving it noisy names.
-- Keep genuinely hidden/inert controls out of active interaction. Referenced
-  hidden labels may still contribute to accessible names; preserve valid sources.
+Visible UI, accessible properties and user actions should derive from the same
+application state. A semantic representation for custom rendering is valid
+when it uses that state and invokes the same guarded commands. An off-screen
+copy with independent values or automation-only mutations is not.
 
-## 2. Controls
+Describe the component in ordinary project terms:
 
-For every action:
+```text
+object and context
+  + state / allowed actions
+  + focus and input behavior
+  + expected transition or error
+  + observation that demonstrates the result
+```
 
-- Use a native button, link, checkbox, radio, switch, slider, tab, menu item,
-  text field, or equivalent platform control type.
-- Do not make a generic `div`, `span`, Canvas object, or image the only action
-  target without implementing the full accessibility contract.
-- Provide a non-empty accessible name.
-- Keep the visible label inside the accessible name.
-- Disambiguate repeated names through a named row/group or a useful object
-  label, such as `Delete report.pdf`. Global name uniqueness is not required
-  when the real client can resolve the row and its action unambiguously.
-- Expose applicable disabled and busy states; ARIA does not enforce behavior.
-- Expose pressed, checked, selected, current, and expanded state only where the
-  role and actual interaction support them.
-- Expose values and min/max/step for range controls.
-- Expose the real semantic action; do not rely on pointer coordinates.
-- Keep hit target and semantic target aligned.
+This is a design aid, not a new runtime schema, ID system or production observer.
 
-## 3. Forms and text input
+## Select the Affected Contract
 
-- Associate every field with a persistent label.
-- Use placeholder text only as an example, never as the sole label.
-- Connect help, limits, and errors with the field.
-- Expose applicable required, invalid, read-only, disabled, and busy states.
-- On failed submission, use a deliberate error/focus strategy, such as the first
-  invalid field or an error summary; do not steal focus on every async update.
-- Keep error relationships and invalid state consistent with current validation.
-- Announce asynchronous validation without repeatedly interrupting the user.
-- Preserve secure/password semantics; never expose the secret as a value.
-- Before synthetic typing, make focused-window and focused-element ownership
-  provable.
+| Component | Expose from actual state | Implement and test |
+|---|---|---|
+| Action or navigation | Name containing visible wording, correct button/link semantics, availability | Native activation, deliberate form behavior, real command guard or navigation |
+| Toggle or choice | Applicable checked/pressed/selected state and group/object context | State changes through the supported input path; no decorative-only toggles |
+| Field | Persistent label, current value, applicable editability, help and validation relationships | Focus, editing, framework state, validation and relevant submit/commit behavior |
+| Composite widget | Owner, popup state, active item and selected value as distinct concepts | Pattern-appropriate arrows, commit, cancel and focus; don't invent a grid for a reading table |
+| Dialog or sheet | Name, actual modality, owning context and actions | Initial focus, background isolation only when modal, dismissal and sensible focus return |
+| Document or panel | Useful title, headings, structure and current selection | Navigation and content agree; evaluate document/application scopes separately |
+| Collection | Row/object context, selection, hierarchy and available position/count information | Sorting/filtering/recycling cannot silently redirect an operation to another object |
+| Async command | Pending, committed or error state and useful recovery | Success follows the actual commit; a timeout remains unknown until reconciled |
+| Spatial/custom surface | Task-relevant objects, selection, bounds and actions | Shared model, keyboard/command alternatives where appropriate, current geometry and verified effect |
 
-## 4. Navigation, tabs, lists, and selection
+Read [Web AX/DOM](web-ax-dom.md) for browser-specific implementation traps or
+[Platform patterns](platform-patterns.md) for native APIs. A correct role alone
+does not add keyboard behavior, editable state or a supported native action.
 
-- Expose current navigation item (`aria-current` or platform equivalent).
-- Expose selected tab/option/tree item.
-- Use the applicable roving-focus, `aria-activedescendant`, or native
-  composite-control pattern. Active item, selection and DOM focus are distinct.
-- Support arrow, Home/End, Enter/Space, and Escape where the platform pattern
-  expects them.
-- Expose list/tree/grid hierarchy, level, position, and count where useful.
-- Keep row selection separate from row actions.
-- Provide names for trailing row actions.
-- Give drag-and-drop a keyboard or command alternative.
+## Identity and Context
 
-## 5. Dialogs, sheets, popovers, and menus
+Keep these purposes distinct:
 
-- Name every dialog.
-- Mark modal dialogs as modal.
-- Move focus into the dialog deterministically.
-- Trap focus only while modal.
-- Restore focus to the opener on close, or a logical next target if it is gone.
-- Expose close/cancel/confirm actions with task-specific names.
-- Open a parent menu before expecting its child items to exist.
-- Block interaction with the page background only when the interaction is
-  actually modal; do not impose modality on all popovers or other windows.
-- Test attached sheets and secondary windows as distinct routing cases.
+| Identity | Purpose | Cannot establish |
+|---|---|---|
+| Visible/accessibility label | Human meaning, localized with the UI | Durable global identity or authorization |
+| Domain object key | Which record/document the operation concerns | Validity of an old node handle |
+| DOM ID or platform identifier | Relationships or supported application lookup | Automatic inclusion in every consumer's output |
+| Runtime ref/index/token | Address a currently observed target | Stable identity across arbitrary navigation or replacement |
 
-## 6. Dynamic state
+Use named rows/regions to distinguish repeated actions before lengthening every
+label. Test how the supported consumer preserves that context. Avoid UUIDs,
+implementation details and instructions embedded in accessible names.
 
-- Announce meaningful loading, success, failure, and completion state.
-- Use live regions/status events sparingly; do not announce every animation or
-  token.
-- Keep a pending action's accessible name stable; publish busy state separately.
-- Update state/value after action completion.
-- Preserve semantic identity across harmless layout reflow.
-- Invalidate identity when the underlying object, process generation, or window
-  changes.
-- Do not let stale hidden nodes remain actionable.
+For virtual lists, expose mounted relevant items and honest position/count
+context; keep active items represented. Do not mount an entire hidden duplicate
+list to satisfy a client. Include a sort, filter or recycled-row test when the
+repair touches collection identity.
 
-## 7. Custom-rendered surfaces
+## Input and Feedback
 
-For Canvas, WebGL, game scenes, diagrams, timelines, editors, or QML/custom
-rendering:
+An input's rendered value, framework state and persisted value can disagree.
+Check the layers relevant to the task. A component that only edits a local draft
+does not need an invented backend persistence test.
 
-- Expose a semantic object model separate from pixels.
-- Give objects stable domain IDs.
-- Expose role, name, state, value, actions, hierarchy, and fresh bounds.
-- Expose selection and focus.
-- Provide semantic commands for non-spatial operations.
-- Derive geometry from current state only when an action is inherently spatial.
-- Verify object mutation after action.
-- Do not hard-code screen coordinates.
+Choose keyboard, pointer, paste, composition or assistive actions from the
+product's supported behavior. A synthetic replacement is not proof of IME,
+undo or rich-text correctness. Keep focus, active descendant and selection
+distinct in composite controls.
 
-## 8. Virtualization
+Busy, disabled, read-only, hidden and modal states have different behavior.
+Keep state declarations and actual command guards consistent. Do not disable
+every covered surface, trap focus in ordinary popovers, or steal focus on every
+validation update.
 
-- Keep visible actionable rows in the tree.
-- Expose total count and visible position where possible.
-- Keep active selection and focused item mounted or represented.
-- Do not recycle a semantic ID onto a different business object.
-- Re-observe after scroll or recycling.
-- Test first, middle, last, empty, loading, and large datasets.
+Make meaningful outcomes readable through visible and accessible state. Avoid
+per-keystroke announcements and success messages that precede persistence.
+History-specific notification and attribution checks belong in
+[History readiness](history-readiness.md), not in every form repair.
 
-## 9. Internationalization
+## Human Usability, Cost and Privacy
 
-- Localize accessibility-only strings with visible UI strings.
-- Do not allow framework English fallbacks in a localized interface.
-- Keep names meaningful after translation and truncation.
-- Do not include hidden status text that changes the control's identity.
-- Test long labels, CJK, RTL where supported, and mixed technical identifiers.
+- Keep localized labels useful after truncation and layout changes. Include
+  long labels, CJK or RTL only where supported by the product.
+- Keep hit regions aligned with visible controls. A screenshot consumer needs
+  visible context; an accessibility-only label may not change its observation.
+- Remove duplicated or decorative semantic noise without discarding useful
+  reading content or actionable descendants to meet a client's token budget.
+- Keep lazy loading and the existing state lifecycle. Measure large-state tree
+  or latency changes when relevant; don't add production traversal for ordinary
+  native controls.
+- Preserve secure-field semantics. Do not copy values into labels, URLs,
+  diagnostics or hidden mirrors to improve observability.
+- Do not redesign the app's permission system as an incidental repair. Existing
+  permission and validation checks must also apply to accessibility actions.
 
-## 10. Computer Use action contract
-
-For each critical workflow, define:
-
-| Step | Requirement |
-|---|---|
-| Observe | Unique target in the exact window |
-| Resolve | Current runtime reference, stable domain meaning, exact scope |
-| Act | Semantic action preferred |
-| Verify | Action-specific state or business effect |
-| Retry | Re-observe and reconcile effects first; never blindly repeat a timeout |
-| Fail | Missing/ambiguous/stale/unverifiable, never guess |
-
-Runtime indexes are observation-local; domain IDs are not runtime action
-handles. A changed row object must not inherit the previous row's identity.
-Fail-closed resolution is a client/runtime property to validate, not something
-ARIA alone can guarantee. Do not claim it from a source-only semantics fix.
-
-Critical actions include create, edit, save, delete, submit, connect, install,
-enable/disable, choose model/account, open/close modal, and navigation.
-
-## 11. Performance
-
-- No production full-tree scan to synthesize basic semantics.
-- No global observer that watches every DOM mutation.
-- No high-frequency accessibility polling.
-- No eager import of every page merely for accessibility.
-- No duplicated hidden "agent UI."
-- Keep decoration out of the tree.
-- Keep actionable and state-bearing descendants in the tree.
-- Measure tree size and observation latency on large real states.
-
-## 12. Privacy and safety
-
-- Do not log raw accessibility values, typed text, passwords, window titles, or
-  screenshots by default.
-- Sanitize test artifacts and CI traces.
-- Treat accessibility permission as a capability gate, not authorization for
-  every action.
-- Separate metadata reads, screenshots, pointer actions, text actions, and
-  sensitive mutations in the product permission model.
-- Require explicit confirmation for destructive or security-sensitive actions.
+For acceptance and report wording, use [Verification](verification.md).
+For reference freshness, delivery and retries, use
+[Consumer contract](consumer-contract.md); those are not guarantees that an
+application obtains just by exposing correct ARIA.

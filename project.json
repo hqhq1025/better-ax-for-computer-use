@@ -1,7 +1,7 @@
 {
   "name": "Better AX for Computer Use",
   "slug": "better-ax-for-computer-use",
-  "description": "An open-source accessibility engineering skill for AI coding agents, with source-level guidance and a partial Chromium AX audit tool.",
+  "description": "An open-source accessibility engineering skill for AI coding agents, with source-level Computer Use and activity-history readiness guidance and a partial Chromium AX audit tool.",
   "repository": "https://github.com/hqhq1025/better-ax-for-computer-use",
   "license": "MIT",
   "maintainer": {"name": "Haoqing Wang", "url": "https://github.com/hqhq1025"},
@@ -13,6 +13,6 @@
   "verification": {
     "command": "node --test scripts/*.test.mjs",
     "scope": "Offline tree, CLI, injected browser lifecycle, documentation and example checks",
-    "limits": ["No full iframe/OOPIF coverage guarantee", "No native platform test runner", "No complete WCAG certification", "No cross-client end-to-end certification"]
+    "limits": ["No full iframe/OOPIF coverage guarantee", "No native platform test runner", "No complete WCAG certification", "No cross-client end-to-end certification", "History guidance is not a recorder or recording-quality test runner"]
   }
 }

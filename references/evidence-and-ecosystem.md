@@ -59,6 +59,32 @@ Therefore, a global count across an Electron window with embedded documents
 is not an adequate failure rule. Native windows need their platform structure,
 not an imposed HTML `main` node.
 
+## Computer History
+
+Reviewed 2026-09-13. The
+[official Computer History documentation](https://developers.openai.com/codex/customization/computer-history)
+describes interaction events with macOS accessibility context, replacing the
+older screenshot-based Chronicle preview. History does not include screenshots
+or audio and does not require Screen Recording permission. It is opt-in, with
+app/website controls and private browsing excluded.
+
+The documented pipeline captures locally, processes temporary events on OpenAI
+servers to generate memories, then stores memories locally. Local capture is
+not an all-local processing guarantee. Temporary events have a retention limit
+of up to 48 hours; generated memories persist until deleted. Changing inclusion
+rules affects future history, not existing data. The documentation also warns
+about prompt injection and sensitive local files.
+
+These product boundaries motivate source attribution, privacy and derived-data
+lifecycle tests in [history-readiness.md](history-readiness.md). They are not a
+promise that arbitrary app metadata is ingested or retained verbatim. Read the
+authoritative document or app after history identifies a relevant source.
+
+An independent clean-room implementation is not official Codex source or proof
+of current product behavior. Public platform sources underpin this skill's
+engineering guidance; no proprietary prompts or native implementation are
+included.
+
 ## Exclusions
 
 CLI-Anything, OpenCLI, WebMCP, and app-specific APIs can provide useful alternate

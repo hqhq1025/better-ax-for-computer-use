@@ -62,6 +62,21 @@ git clone https://github.com/hqhq1025/better-ax-for-computer-use.git \
 只读审计不授权修改源码或执行改变状态的探测。源码可改的自绘界面可以在应用内
 修复；不可内修的闭源目标需要另行确定外部 adapter 任务。
 
+## 活动历史可记录性
+
+当目标是让 Computer History 等已授权的消费者更准确地理解活动时，skill
+还会检查路由与文档身份、状态变化、窗口及 frame 归属、隐私边界和任务重建。
+
+```text
+用 $better-ax-for-computer-use 改善这个应用的 Computer History 可记录性。
+修复应用侧语义，用合成导航和保存流程比较前后结果。
+不启用录制，不读取个人活动。
+```
+
+参阅[专项指南](references/history-readiness.md)和[合成测试计划](references/history-readiness-test-plan.md)。
+应用修复、OS 集成、记录器策略与摘要质量分开验收；本项目没有新增录制器或
+Codex 数据导入 API。AX 快照审计不能证明事件送达或历史记录质量。
+
 ## 运行离线审计
 
 支持基线为 Node.js 22 或更新版本。离线检查与单元测试不需要 npm 依赖：
@@ -149,6 +164,8 @@ node ~/.agents/skills/better-ax-for-computer-use/scripts/audit_chromium_ax.mjs \
 - [开发检查表](references/developer-checklist.md)
 - [平台实现模式](references/platform-patterns.md)
 - [消费者契约与负例](references/consumer-contract.md)
+- [活动历史可记录性](references/history-readiness.md)
+- [合成历史测试计划](references/history-readiness-test-plan.md)
 - [验证与完成标准](references/verification.md)
 - [公开来源与生态参考](references/evidence-and-ecosystem.md)
 - [机器可读项目事实](project.json) 与 [纯文本索引](llms.txt)

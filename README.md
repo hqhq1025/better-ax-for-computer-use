@@ -29,6 +29,8 @@ computer-control runtime, external adapter, or accessibility certification.
 - A SwiftUI, Qt, Canvas, or other custom control needs native accessibility
   semantics tied to the same state and commit path as its visual UI.
 - An action reports success but the intended setting or record is not saved.
+- An activity-history consumer loses document identity, misses state transitions,
+  or confuses an attempted action with its outcome.
 
 For example, an unnamed Save button needs a meaningful name and usable state.
 After activation, the workflow must also confirm that the intended record was
@@ -85,6 +87,24 @@ Client-specific discovery and invocation syntax may differ.
 
 Source-unmodifiable applications require a separately scoped adapter task.
 The skill does not install private APIs, an MCP server, or a hidden agent UI.
+
+## Activity History Readiness
+
+For Computer History and other authorized activity-recording consumers, the
+skill also covers accurate route/document identity, observable state changes,
+window/frame attribution, privacy boundaries, and workflow reconstruction.
+
+```text
+Use $better-ax-for-computer-use to improve this app for Computer History.
+Fix app-side semantics and compare synthetic navigation and save workflows.
+Do not enable recording or read personal activity.
+```
+
+Use the [history-readiness guide](references/history-readiness.md) and
+[test plan](references/history-readiness-test-plan.md). They distinguish
+app-side repairs from OS integration, recorder policy, and summarization.
+This is engineering guidance, not a recorder or Codex ingestion API.
+The Chromium lint does not measure event delivery or recording quality.
 
 ## Chromium Audit Tool
 
@@ -165,6 +185,8 @@ specified path and overwrites an existing file.
 - [Developer checklist](references/developer-checklist.md)
 - [Platform patterns](references/platform-patterns.md)
 - [Consumer contract and negative cases](references/consumer-contract.md)
+- [Activity history readiness](references/history-readiness.md)
+- [Synthetic history test plan](references/history-readiness-test-plan.md)
 - [Verification and completion gates](references/verification.md)
 - [Public sources and ecosystem inputs](references/evidence-and-ecosystem.md)
 - [Machine-readable project facts](project.json)

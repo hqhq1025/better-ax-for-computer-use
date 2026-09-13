@@ -17,6 +17,9 @@ external adapter, or accessibility certification.
 
 ## Engineering Guides
 
+- [Activity history readiness](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/history-readiness.md): App semantics, source attribution, observable changes, privacy, and reconstruction; no recorder installation.
+- [History test plan](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/history-readiness-test-plan.md): Synthetic baseline/candidate comparison and evidence boundaries.
+
 - [Developer checklist](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/developer-checklist.md): Roles, names, state, focus, identity, and privacy.
 - [Platform patterns](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/platform-patterns.md): DOM/ARIA, AppKit/SwiftUI, UIA, Qt, GTK, and custom rendering.
 - [Consumer contract](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/consumer-contract.md): Observation scope, action delivery, effects, stale targets, and timeout recovery.

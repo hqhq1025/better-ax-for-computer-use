@@ -1,6 +1,6 @@
 ---
 name: better-ax-for-computer-use
-description: Improve source-modifiable apps for Computer Use through reliable accessibility semantics, target identity, actions, focus, and observable effects. Use for AX/a11y/UIA audits or repairs, agent-operable UI, and Computer Use readiness in web, Electron, native, or custom-rendered apps. Not for operating an app or building external adapters for unmodifiable targets.
+description: Improve source-modifiable web and native apps for Computer Use through accessibility semantics, identity, actions, and observable changes. Use for AX/a11y/UIA repairs, agent-operable UI, or making apps easier for Computer History to observe accurately and privately. Not for operating apps, querying personal history, or installing recorders.
 ---
 
 # Better AX for Computer Use
@@ -23,8 +23,10 @@ is a separate task outside this skill. Custom rendering alone does not require
 an external adapter when the application source is available.
 
 An audit or review remains read-only. Implement fixes when requested; do not
-expand an app semantics task into a CU runtime, MCP server, recording system,
-or hidden automation API. A narrower requested scope needs only the relevant
+expand an app semantics task into a CU runtime, MCP server, new recorder,
+or hidden automation API. History-readiness work can improve source semantics
+and assess an existing consumer; recorder changes require their own scope.
+A narrower requested scope needs only the relevant
 workflow steps and checks below.
 
 Treat WCAG as the human accessibility baseline, not the full Computer Use
@@ -184,6 +186,23 @@ coverage; a single-control repair does not require auditing the entire product.
 Read `references/evidence-and-ecosystem.md` when choosing interoperability
 tests or reviewing the public-source rationale. Its dated findings are
 design inputs, not dependencies on any particular CU runtime.
+
+## When Activity History Is the Goal
+
+Read [history-readiness.md](references/history-readiness.md) when the request
+concerns recording, task reconstruction, or app changes for Computer History.
+Use its [test plan](references/history-readiness-test-plan.md) for relevant
+baseline/candidate comparisons, not for ordinary single-control repairs.
+
+Separate readable state, observable changes, and correct source attribution.
+Verify app/window/document/frame identity, focus and selection, asynchronous
+outcomes, privacy boundaries, and missing intervals on the supported consumer.
+A snapshot lint cannot validate a recording pipeline or reconstruction quality.
+
+Keep app fixes, OS/bridge integration, recorder guarantees, and summary quality
+separate. Use synthetic fixtures or existing authorized evidence. Do not enable
+recording, read personal activity, or change retention just to validate this
+skill. History lookup belongs to the user's history tool, not this workflow.
 
 ## Deliverables
 

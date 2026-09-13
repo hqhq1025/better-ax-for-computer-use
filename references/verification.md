@@ -172,6 +172,13 @@ Do not add recording infrastructure unless requested.
 
 ## Completion gate
 
+When history quality is requested, use the separate
+[history-readiness guide](history-readiness.md) and
+[synthetic test plan](history-readiness-test-plan.md). Verify state readability,
+change observation, source attribution, privacy and reconstruction independently.
+Neither an AX lint pass nor a successful action proves that the recorder retained
+the transition or that a summary recovered the supported outcome.
+
 An audit is complete when its requested scope, evidence, findings, and coverage
 limits are reported. Defects and missing runtime evidence do not require
 unauthorized repairs or interactions; label source-only or partial conclusions.

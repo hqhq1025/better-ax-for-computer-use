@@ -85,6 +85,28 @@ of current product behavior. Public platform sources underpin this skill's
 engineering guidance; no proprietary prompts or native implementation are
 included.
 
+## Web AX and DOM
+
+Reviewed 2026-09-13. [web-ax-dom.md](web-ax-dom.md) provides primary standards
+and version-matched Playwright sources. Its optional browser probes were run
+with Playwright 1.57.0 / Chrome 153.0.8010.36 in isolated synthetic pages.
+Nine cases passed, including computed label override, hidden label references,
+ARIA-only disabled behavior, inert focus/AX, open/closed Shadow DOM, frame scope,
+remount identity, covered fill versus click, and a pre-handler click.
+
+The probes deliberately demonstrate counterexamples; a pass does not mean a
+defective fixture is accessible. No native bridge, screen-reader, real IME,
+cross-origin OOPIF or production persistence validation is implied.
+
+## Named Consumers
+
+The [named-consumer guide](web-consumers.md) adds a 2026-09-13 source audit of
+TryCua at `31c2184f860bac1fd7df42a75c47053ce3be48f9` and current official
+Codex product boundaries. It separates Python screenshot loops, optional
+platform tree APIs, Rust browser snapshot formats and structured-result
+forwarding. These are source findings, not live TryCua/Codex interoperability
+results. Correct raw AX does not imply an identical model-visible projection.
+
 ## Exclusions
 
 CLI-Anything, OpenCLI, WebMCP, and app-specific APIs can provide useful alternate

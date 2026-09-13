@@ -88,6 +88,36 @@ Client-specific discovery and invocation syntax may differ.
 Source-unmodifiable applications require a separately scoped adapter task.
 The skill does not install private APIs, an MCP server, or a hidden agent UI.
 
+## Web AX and DOM
+
+Targeting TryCua or Codex? The [consumer guide](references/web-consumers.md)
+separates screenshot, DOM, browser AX and native accessibility paths, and shows
+how to identify what the selected adapter actually consumes.
+
+The [Web engineering guide](references/web-ax-dom.md) covers computed names,
+DOM versus browser AX, native/ARIA behavior, controlled input, hydration,
+composite widgets, portals, frames, Shadow DOM and custom rendering.
+It starts with the failing layer and ends with a verified application effect.
+
+```text
+Use $better-ax-for-computer-use to repair this web form.
+Compare DOM role/label resolution with browser AX, then verify keyboard input,
+validation and the committed result. Keep changes scoped to this form.
+```
+
+Optional real-browser probes demonstrate nine synthetic boundary cases:
+
+```sh
+# Requires Playwright and its Chromium installed in the invoking workspace.
+node scripts/probe_web_contracts.mjs
+# Or explicitly use an installed Google Chrome in a fresh isolated session:
+WEB_AX_CHANNEL=chrome node scripts/probe_web_contracts.mjs
+```
+
+These probes do not connect to user tabs or record history. They are separate
+from offline CI, report the exact browser/tool versions, and do not certify a
+real app, OS accessibility bridge, screen reader, IME or cross-origin OOPIF.
+
 ## Activity History Readiness
 
 For Computer History and other authorized activity-recording consumers, the
@@ -184,6 +214,7 @@ specified path and overwrites an existing file.
 - [Skill entry point](SKILL.md)
 - [Developer checklist](references/developer-checklist.md)
 - [Platform patterns](references/platform-patterns.md)
+- [Web AX/DOM diagnostics and repair](references/web-ax-dom.md)
 - [Consumer contract and negative cases](references/consumer-contract.md)
 - [Activity history readiness](references/history-readiness.md)
 - [Synthetic history test plan](references/history-readiness-test-plan.md)
@@ -196,7 +227,7 @@ specified path and overwrites an existing file.
 
 | Surface | Included guidance | Executable verification included |
 |---|---|---|
-| Web / React / Chromium | HTML, ARIA, controls, focus, frames, controlled input | Partial Chromium AX lint and offline regression tests |
+| Web / React / Chromium | HTML, ARIA, computed names, input, hydration, frames, Shadow DOM | Partial AX lint, offline regressions and optional synthetic browser probes |
 | Electron | Renderer semantics and native window/process boundaries | Chromium lint only; native bridge requires separate verification |
 | macOS AppKit / SwiftUI | Native controls, virtual elements, representation and persistence | Guidance; no bundled native test runner |
 | Windows UIA | Control types, patterns, state and identity | Guidance; no bundled UIA runner |

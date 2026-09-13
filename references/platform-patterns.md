@@ -13,13 +13,14 @@ Prefer intrinsic elements:
 </button>
 ```
 
-Use ARIA only when native HTML cannot express the pattern:
+Prefer the corresponding native HTML capability; use permitted ARIA to supply
+semantics it lacks, such as `aria-pressed` on the native button above:
 
 ```tsx
 <nav aria-label="Settings sections">
-  <button aria-current={section === 'general' ? 'page' : undefined}>
+  <a href="/settings/general" aria-current={section === 'general' ? 'page' : undefined}>
     General
-  </button>
+  </a>
 </nav>
 ```
 
@@ -37,12 +38,16 @@ Rules:
 - Expose `aria-selected`, `aria-current`, `aria-expanded`, `aria-pressed`,
   `aria-checked`, `aria-busy`, `aria-invalid`, and value attributes from the
   same state that renders the UI.
-- Set `inert` on obscured application surfaces when a modal or replacement
-  surface owns interaction.
+- Use `inert` for page subtrees that genuinely lose interaction eligibility
+  under a modal or replacement surface, not every visually covered area.
+  Prefer native modal behavior where available.
 - Test the Chromium accessibility tree, not only DOM attributes.
 - In Electron, inspect each relevant WebContentsView, iframe, popup, and native
   dialog separately. Renderer CDP coverage does not prove native AX bridge
   coverage or OS-level focus routing.
+
+Read [web-ax-dom.md](web-ax-dom.md) for computed-name diagnostics, form/ARIA
+behavior, hydration, portals, frame/shadow boundaries and executable probes.
 
 Official references:
 

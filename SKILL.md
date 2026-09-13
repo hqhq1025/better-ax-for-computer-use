@@ -1,6 +1,6 @@
 ---
 name: better-ax-for-computer-use
-description: Improve source-modifiable web and native apps for Computer Use through accessibility semantics, identity, actions, and observable changes. Use for AX/a11y/UIA repairs, agent-operable UI, or making apps easier for Computer History to observe accurately and privately. Not for operating apps, querying personal history, or installing recorders.
+description: Improve source-modifiable web and native apps for Computer Use through DOM/AX semantics, identity, actions, and observable changes. Use for web accessibility and ARIA repairs, AX/UIA audits, agent-operable UI, or Computer History readiness. Not for operating apps, querying personal history, or installing recorders.
 ---
 
 # Better AX for Computer Use
@@ -102,6 +102,15 @@ For every user-operable control, expose:
 Read `references/developer-checklist.md` for the detailed requirement matrix.
 Read `references/platform-patterns.md` for framework-specific implementation
 patterns.
+
+For Web, React, Web Components or Electron renderers, read
+[web-ax-dom.md](references/web-ax-dom.md). Diagnose computed names, DOM versus
+browser AX coverage, input behavior, hydration and frame/shadow scope before
+adding attributes. Use its optional synthetic probes for consumer-boundary
+research; a single-control repair only needs the relevant application tests.
+When targeting a named client such as TryCua or Codex, also read
+[web-consumers.md](references/web-consumers.md). Identify the selected
+model/adapter and actual observation payload before declaring AX requirements.
 
 ### 4. Make workflows discoverable, not merely clickable
 

@@ -8,11 +8,13 @@
   "entrypoint": "SKILL.md",
   "readme": {"en": "README.md", "zh-CN": "README.zh-CN.md"},
   "documentationIndex": "llms.txt",
-  "runtime": {"auditTool": "Node.js >=22", "offlineDependencies": [], "liveCapture": ["playwright or @playwright/test in target workspace"]},
+  "runtime": {"auditTool": "Node.js >=22", "offlineDependencies": [], "liveCapture": ["playwright or @playwright/test in target workspace"], "syntheticWebProbes": ["playwright in invoking workspace", "matching Chromium or explicit WEB_AX_CHANNEL=chrome"]},
   "guidancePlatforms": ["Web", "React", "Electron", "macOS AppKit", "SwiftUI", "Windows UIA", "Qt", "GTK", "Custom-rendered controls"],
   "verification": {
     "command": "node --test scripts/*.test.mjs",
     "scope": "Offline tree, CLI, injected browser lifecycle, documentation and example checks",
+    "optionalBrowserCommand": "node scripts/probe_web_contracts.mjs",
+    "optionalBrowserScope": "Nine synthetic DOM/Chromium AX and action-boundary probes; not part of offline CI",
     "limits": ["No full iframe/OOPIF coverage guarantee", "No native platform test runner", "No complete WCAG certification", "No cross-client end-to-end certification", "History guidance is not a recorder or recording-quality test runner"]
   }
 }

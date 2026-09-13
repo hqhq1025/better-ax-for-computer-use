@@ -11,7 +11,8 @@ Use this as the detailed implementation and review matrix.
 - Give each page/dialog/window a distinct name.
 - Preserve a useful heading hierarchy.
 - Mark decorative content as decorative instead of giving it noisy names.
-- Keep hidden or inert application surfaces out of the active tree.
+- Keep genuinely hidden/inert controls out of active interaction. Referenced
+  hidden labels may still contribute to accessible names; preserve valid sources.
 
 ## 2. Controls
 
@@ -26,8 +27,9 @@ For every action:
 - Disambiguate repeated names through a named row/group or a useful object
   label, such as `Delete report.pdf`. Global name uniqueness is not required
   when the real client can resolve the row and its action unambiguously.
-- Expose disabled and busy states.
-- Expose pressed, checked, selected, current, and expanded state.
+- Expose applicable disabled and busy states; ARIA does not enforce behavior.
+- Expose pressed, checked, selected, current, and expanded state only where the
+  role and actual interaction support them.
 - Expose values and min/max/step for range controls.
 - Expose the real semantic action; do not rely on pointer coordinates.
 - Keep hit target and semantic target aligned.
@@ -37,8 +39,10 @@ For every action:
 - Associate every field with a persistent label.
 - Use placeholder text only as an example, never as the sole label.
 - Connect help, limits, and errors with the field.
-- Expose required, invalid, read-only, disabled, and busy states.
-- Move focus to the invalid field or error summary on failed submission.
+- Expose applicable required, invalid, read-only, disabled, and busy states.
+- On failed submission, use a deliberate error/focus strategy, such as the first
+  invalid field or an error summary; do not steal focus on every async update.
+- Keep error relationships and invalid state consistent with current validation.
 - Announce asynchronous validation without repeatedly interrupting the user.
 - Preserve secure/password semantics; never expose the secret as a value.
 - Before synthetic typing, make focused-window and focused-element ownership
@@ -48,7 +52,8 @@ For every action:
 
 - Expose current navigation item (`aria-current` or platform equivalent).
 - Expose selected tab/option/tree item.
-- Use roving focus or the framework's native composite-control behavior.
+- Use the applicable roving-focus, `aria-activedescendant`, or native
+  composite-control pattern. Active item, selection and DOM focus are distinct.
 - Support arrow, Home/End, Enter/Space, and Escape where the platform pattern
   expects them.
 - Expose list/tree/grid hierarchy, level, position, and count where useful.
@@ -62,10 +67,11 @@ For every action:
 - Mark modal dialogs as modal.
 - Move focus into the dialog deterministically.
 - Trap focus only while modal.
-- Restore focus to the opener on close.
+- Restore focus to the opener on close, or a logical next target if it is gone.
 - Expose close/cancel/confirm actions with task-specific names.
 - Open a parent menu before expecting its child items to exist.
-- Keep background windows and hidden overlays inert.
+- Block interaction with the page background only when the interaction is
+  actually modal; do not impose modality on all popovers or other windows.
 - Test attached sheets and secondary windows as distinct routing cases.
 
 ## 6. Dynamic state

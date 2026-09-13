@@ -17,6 +17,10 @@ external adapter, or accessibility certification.
 
 ## Engineering Guides
 
+- [TryCua and Codex consumer contracts](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/web-consumers.md): Selected adapter payload, screenshot versus semantic paths, browser projections and scoped acceptance.
+
+- [Web AX and DOM](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/web-ax-dom.md): Computed names, native/ARIA behavior, forms, hydration, frames, Shadow DOM and scoped validation.
+
 - [Activity history readiness](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/history-readiness.md): App semantics, source attribution, observable changes, privacy, and reconstruction; no recorder installation.
 - [History test plan](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/history-readiness-test-plan.md): Synthetic baseline/candidate comparison and evidence boundaries.
 
@@ -27,6 +31,8 @@ external adapter, or accessibility certification.
 - [Source notes](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/references/evidence-and-ecosystem.md): Public documentation and dated ecosystem inputs.
 
 ## Executable Material
+
+- [Synthetic Web probes](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/scripts/probe_web_contracts.mjs): Opt-in isolated browser checks of DOM/AX/action boundaries; requires Playwright and an installed browser, not production app certification.
 
 - [Audit script](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/scripts/audit_chromium_ax.mjs): Offline JSON or authorized live Chromium capture; Node.js 22+.
 - [Regression tests](https://github.com/hqhq1025/better-ax-for-computer-use/blob/main/scripts/audit_chromium_ax.test.mjs): Offline and injected-browser tests, not real-browser E2E.

@@ -62,6 +62,34 @@ git clone https://github.com/hqhq1025/better-ax-for-computer-use.git \
 只读审计不授权修改源码或执行改变状态的探测。源码可改的自绘界面可以在应用内
 修复；不可内修的闭源目标需要另行确定外部 adapter 任务。
 
+## Web AX 与 DOM
+
+针对 TryCua 或 Codex 适配时，先读[消费者指南](references/web-consumers.md)，
+区分截图、DOM、浏览器 AX 与原生可访问性路径，并确认所选 adapter 实际传给
+模型的内容。SDK 有 tree API 不代表 agent 的每一步都在用 AX。
+
+[Web 专项指南](references/web-ax-dom.md)覆盖计算后的名称、DOM 与浏览器 AX
+差异、原生控件与 ARIA 行为、受控输入、hydration、复合控件、portal、
+iframe、Shadow DOM 和自绘界面。先定位故障所在层，再修复并验证业务结果。
+
+```text
+用 $better-ax-for-computer-use 修复这个 Web 表单。
+对比 DOM role/label 定位和浏览器 AX，验证键盘输入、错误处理及提交结果。
+修改范围仅限这个表单。
+```
+
+新增 9 个合成真实浏览器探测，单独运行，不属于离线 CI：
+
+```sh
+# 需要调用工作区已有 Playwright 及对应 Chromium。
+node scripts/probe_web_contracts.mjs
+# 或明确使用已安装 Chrome，创建全新隔离会话。
+WEB_AX_CHANNEL=chrome node scripts/probe_web_contracts.mjs
+```
+
+探测不会连接现有标签页或记录个人历史。报告包含实际浏览器与工具版本，
+不代表真实应用、原生 AX、屏幕阅读器、IME 或跨源 OOPIF 已通过测试。
+
 ## 活动历史可记录性
 
 当目标是让 Computer History 等已授权的消费者更准确地理解活动时，skill
@@ -163,6 +191,7 @@ node ~/.agents/skills/better-ax-for-computer-use/scripts/audit_chromium_ax.mjs \
 - [Skill 入口](SKILL.md)
 - [开发检查表](references/developer-checklist.md)
 - [平台实现模式](references/platform-patterns.md)
+- [Web AX/DOM 诊断与修复](references/web-ax-dom.md)
 - [消费者契约与负例](references/consumer-contract.md)
 - [活动历史可记录性](references/history-readiness.md)
 - [合成历史测试计划](references/history-readiness-test-plan.md)

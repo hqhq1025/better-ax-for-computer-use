@@ -69,6 +69,11 @@ For each final state:
 
 For Chromium/Electron:
 
+Use [web-ax-dom.md](web-ax-dom.md) to diagnose DOM/browser AX divergence,
+computed names, hydration and frame/shadow coverage. Its optional real-browser
+probes verify synthetic method boundaries, not the target application's
+semantics, assistive-technology behavior or full platform coverage.
+
 ```sh
 node scripts/audit_chromium_ax.mjs --url http://127.0.0.1:3000
 node scripts/audit_chromium_ax.mjs --cdp http://127.0.0.1:9222 --page-title "My App"
